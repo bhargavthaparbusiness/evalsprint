@@ -1,0 +1,96 @@
+import type { Suite } from "./types.js";
+
+/**
+ * Built-in demo suite. Mock fixtures are written so that the baseline prompt
+ * fails most cases and the structured prompt fixes most of them (with one
+ * deliberate regression), which exercises pass, fail and comparison flows.
+ * The fixtures are hand-written examples, not real model outputs.
+ */
+export const sampleSuite: Suite = {
+  version: 1,
+  name: "Support ticket summarizer",
+  description:
+    "Checks that ticket summaries cite the ticket ID, assign a priority (P1–P3), stay short, and never promise refunds.",
+  prompts: [
+    {
+      id: "baseline",
+      name: "v1 — baseline",
+      template: "Summarize this support ticket:\n\n{{ticket}}",
+    },
+    {
+      id: "structured",
+      name: "v2 — structured",
+      system: "You are a support triage assistant. Be concise and factual.",
+      template:
+        "Summarize the ticket in one sentence. Start with the ticket ID in square brackets, then a priority of P1 (outage), P2 (billing or degraded service) or P3 (question or feature request). Never promise refunds. If the ticket lacks detail, say you need more information.\n\nTicket {{ticket_id}}:\n{{ticket}}",
+    },
+  ],
+  cases: [
+    {
+      id: "login-outage",
+      name: "Login outage is P1",
+      vars: {
+        ticket_id: "T-1001",
+        ticket: "Nobody on our team can log in since 9am. SSO returns error 500 for every user.",
+      },
+      assertions: [
+        { type: "contains", value: "T-1001" },
+        { type: "regex", pattern: "\\bP1\\b" },
+        { type: "max-length", value: 200 },
+      ],
+      mockResponses: {
+        baseline: "Customers cannot log in because SSO is returning a 500 error.",
+        structured: "[T-1001] P1 — All users are locked out; SSO has returned HTTP 500 since 09:00.",
+      },
+    },
+    {
+      id: "refund-request",
+      name: "Billing issue without refund promise",
+      vars: {
+        ticket_id: "T-1002",
+        ticket: "I was charged twice for my March invoice and I want my money back.",
+      },
+      assertions: [
+        { type: "contains", value: "T-1002" },
+        { type: "not-contains", value: "we will refund" },
+        { type: "regex", pattern: "\\bP[23]\\b" },
+      ],
+      mockResponses: {
+        baseline: "The customer was double-charged in March and we will refund the duplicate payment.",
+        structured: "[T-1002] P2 — Customer reports a duplicate charge on the March invoice; billing to investigate.",
+      },
+    },
+    {
+      id: "feature-request",
+      name: "Feature request is P3",
+      vars: {
+        ticket_id: "T-1003",
+        ticket: "Would be great if we could export the usage report as CSV.",
+      },
+      assertions: [
+        { type: "contains", value: "T-1003" },
+        { type: "regex", pattern: "\\bP3\\b" },
+      ],
+      mockResponses: {
+        baseline: "[T-1003] P3 — Customer asks for CSV export of the usage report.",
+        structured: "[T-1003] P2 — Customer asks for CSV export of the usage report.",
+      },
+    },
+    {
+      id: "vague-ticket",
+      name: "Vague ticket asks for details",
+      vars: {
+        ticket_id: "T-1004",
+        ticket: "it's broken again",
+      },
+      assertions: [
+        { type: "contains", value: "T-1004" },
+        { type: "contains", value: "more information" },
+      ],
+      mockResponses: {
+        baseline: "The product is broken again.",
+        structured: "[T-1004] P3 — The report is too vague to act on; we need more information from the customer.",
+      },
+    },
+  ],
+};

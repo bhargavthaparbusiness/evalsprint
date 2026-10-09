@@ -147,3 +147,7 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# EvalSprint
+# Suite files created by `evalsprint init` in the repo root (examples/ is tracked)
+/evalsprint.suite.json

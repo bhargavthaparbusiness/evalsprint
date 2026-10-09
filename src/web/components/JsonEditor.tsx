@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { parseSuite } from "../../core/schema.js";
 import type { Suite } from "../../core/types.js";
+import { Icon } from "./Icon";
 import { Notice } from "./ui";
 
 /** Raw JSON view of the suite — the same format the CLI reads. */
@@ -31,11 +32,15 @@ export function JsonEditor({ suite, onChange }: { suite: Suite; onChange: (suite
   }
 
   return (
-    <section aria-labelledby="json-heading">
+    <section className="view" aria-labelledby="json-heading">
       <div className="toolbar">
-        <h2 id="json-heading" className="section-title">
-          Suite JSON
-        </h2>
+        <div className="toolbar-title">
+          <h2 id="json-heading">Suite JSON</h2>
+          <p>
+            The exact file format the CLI reads (<code>evalsprint run suite.json</code>). Changes are validated before
+            they apply.
+          </p>
+        </div>
         <div className="toolbar-controls">
           <button
             className="btn"
@@ -48,14 +53,11 @@ export function JsonEditor({ suite, onChange }: { suite: Suite; onChange: (suite
             Revert
           </button>
           <button className="btn btn-primary" onClick={apply} disabled={!dirty}>
+            <Icon name="check" />
             Apply changes
           </button>
         </div>
       </div>
-      <p className="muted small">
-        This is the exact file format used by the CLI (<code>evalsprint run suite.json</code>). Changes are validated
-        before they are applied.
-      </p>
       {errors.length > 0 ? (
         <Notice tone="error" title="Not applied">
           <ul>
@@ -67,7 +69,7 @@ export function JsonEditor({ suite, onChange }: { suite: Suite; onChange: (suite
       ) : null}
       {applied && !dirty && errors.length === 0 ? <Notice tone="info">Changes applied.</Notice> : null}
       <textarea
-        className="mono json-editor"
+        className="mono json-editor code-area"
         spellCheck={false}
         value={text}
         onChange={(e) => {

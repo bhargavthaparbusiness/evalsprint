@@ -1,6 +1,7 @@
 import type { Assertion, AssertionType, Suite, TestCase } from "../../core/types.js";
 import { extractVariables } from "../../core/template.js";
 import { uniqueId } from "../ids";
+import { Icon } from "./Icon";
 import { Field } from "./ui";
 
 const ASSERTION_TYPES: { type: AssertionType; label: string }[] = [
@@ -39,6 +40,7 @@ function AssertionRow({
   return (
     <div className="assertion-row">
       <select
+        className="assertion-type"
         aria-label="Assertion type"
         value={assertion.type}
         onChange={(e) => onChange(defaultAssertion(e.target.value as AssertionType))}
@@ -49,6 +51,7 @@ function AssertionRow({
           </option>
         ))}
       </select>
+      <div className="assertion-fields">
       {assertion.type === "contains" || assertion.type === "not-contains" ? (
         <>
           <input
@@ -112,14 +115,15 @@ function AssertionRow({
           onChange={(e) => onChange({ ...assertion, value: e.target.valueAsNumber })}
         />
       ) : null}
+      </div>
       <button
-        className="btn btn-sm btn-ghost"
+        className="btn btn-ghost btn-icon assertion-remove"
         onClick={onRemove}
         disabled={!canRemove}
         aria-label="Remove assertion"
         title={canRemove ? "Remove assertion" : "Each test case needs at least one assertion"}
       >
-        Remove
+        <Icon name="x" />
       </button>
     </div>
   );
@@ -155,19 +159,21 @@ export function CasesEditor({ suite, onChange }: { suite: Suite; onChange: (suit
   }
 
   return (
-    <section aria-labelledby="cases-heading">
+    <section className="view" aria-labelledby="cases-heading">
       <div className="toolbar">
-        <h2 id="cases-heading" className="section-title">
-          Test cases <span className="count">{suite.cases.length}</span>
-        </h2>
-        <button className="btn" onClick={() => add()}>
-          Add test case
-        </button>
+        <div className="toolbar-title">
+          <h2 id="cases-heading">
+            Test cases <span className="count">{suite.cases.length}</span>
+          </h2>
+          <p>A case passes only when every assertion passes. Mock fixtures are the canned outputs the mock provider returns.</p>
+        </div>
+        <div className="toolbar-controls">
+          <button className="btn" onClick={() => add()}>
+            <Icon name="plus" />
+            Add case
+          </button>
+        </div>
       </div>
-      <p className="muted small">
-        A case passes only when every assertion passes. Mock fixtures are the canned outputs the mock provider returns
-        for each prompt version — they let you demo and test the pipeline without calling a model.
-      </p>
       <div className="stack">
         {suite.cases.map((testCase, index) => {
           const extraVars = Object.keys(testCase.vars).filter((v) => !promptVars.includes(v));
@@ -181,11 +187,13 @@ export function CasesEditor({ suite, onChange }: { suite: Suite; onChange: (suit
           return (
             <details key={index} className="card case-card" open={index === 0 || suite.cases.length <= 3 || undefined}>
               <summary className="card-head">
+                <Icon name="chevronRight" className="disclosure-chevron" />
                 <span className="card-title">
-                  {testCase.name || "Untitled case"} <span className="cell-sub mono">{testCase.id}</span>
+                  <span className="truncate">{testCase.name || "Untitled case"}</span>
+                  <span className="id-chip mono hide-xs">{testCase.id}</span>
                 </span>
-                <span className="muted small">
-                  {testCase.assertions.length} assertion{testCase.assertions.length === 1 ? "" : "s"}
+                <span className="card-count mono">
+                  {testCase.assertions.length} check{testCase.assertions.length === 1 ? "" : "s"}
                 </span>
               </summary>
               <div className="card-body">
@@ -198,7 +206,9 @@ export function CasesEditor({ suite, onChange }: { suite: Suite; onChange: (suit
                   </Field>
                 </div>
 
-                <h4 className="subhead">Variables</h4>
+                <h4 className="subhead">
+                  <Icon name="braces" /> Variables
+                </h4>
                 {promptVars.length === 0 && extraVars.length === 0 ? (
                   <p className="muted small">The prompt templates don't use any variables.</p>
                 ) : null}
@@ -212,8 +222,8 @@ export function CasesEditor({ suite, onChange }: { suite: Suite; onChange: (suit
                   </Field>
                 ))}
                 {extraVars.length > 0 ? (
-                  <p className="muted small">
-                    Unused variables:{" "}
+                  <p className="muted small chips">
+                    Unused:{" "}
                     {extraVars.map((v) => (
                       <button
                         key={v}
@@ -224,13 +234,16 @@ export function CasesEditor({ suite, onChange }: { suite: Suite; onChange: (suit
                           update(index, { vars: rest });
                         }}
                       >
-                        {v} ×
+                        {v}
+                        <Icon name="x" />
                       </button>
                     ))}
                   </p>
                 ) : null}
 
-                <h4 className="subhead">Assertions</h4>
+                <h4 className="subhead">
+                  <Icon name="check" /> Assertions
+                </h4>
                 <div className="stack-sm">
                   {testCase.assertions.map((assertion, ai) => (
                     <AssertionRow
@@ -245,14 +258,17 @@ export function CasesEditor({ suite, onChange }: { suite: Suite; onChange: (suit
                   ))}
                 </div>
                 <button
-                  className="btn btn-sm add-assertion"
+                  className="btn btn-sm btn-ghost add-assertion"
                   onClick={() => update(index, { assertions: [...testCase.assertions, defaultAssertion("contains")] })}
                 >
+                  <Icon name="plus" />
                   Add assertion
                 </button>
 
-                <h4 className="subhead">Mock fixtures</h4>
-                <p className="muted small">
+                <h4 className="subhead">
+                  <Icon name="flask" /> Mock fixtures
+                </h4>
+                <p className="field-hint">
                   Leave empty to fall back to the default fixture, then to an echo of the rendered prompt. Start a
                   fixture with <code>!error:</code> to simulate a provider failure.
                 </p>
@@ -269,15 +285,17 @@ export function CasesEditor({ suite, onChange }: { suite: Suite; onChange: (suit
                 )}
 
                 <div className="card-actions card-foot">
-                  <button className="btn btn-sm" onClick={() => add(testCase)}>
+                  <button className="btn btn-sm btn-ghost" onClick={() => add(testCase)}>
+                    <Icon name="copy" />
                     Duplicate
                   </button>
                   <button
-                    className="btn btn-sm btn-danger"
+                    className="btn btn-sm btn-ghost btn-danger"
                     onClick={() => remove(index)}
                     disabled={suite.cases.length <= 1}
                     title={suite.cases.length <= 1 ? "A suite needs at least one test case" : undefined}
                   >
+                    <Icon name="trash" />
                     Delete case
                   </button>
                 </div>

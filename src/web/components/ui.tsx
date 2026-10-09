@@ -1,26 +1,87 @@
 import type { ReactNode } from "react";
 import type { CaseStatus, TokenUsage } from "../../core/types.js";
+import type { IconName } from "../design/icons";
+import { Icon } from "./Icon";
 
-export function StatusBadge({ status }: { status: CaseStatus }) {
-  const label = status === "pass" ? "Pass" : status === "fail" ? "Fail" : "Error";
-  return <span className={`badge badge-${status}`}>{label}</span>;
+const STATUS: Record<CaseStatus, { label: string; icon: IconName }> = {
+  pass: { label: "Pass", icon: "check" },
+  fail: { label: "Fail", icon: "x" },
+  error: { label: "Error", icon: "alert" },
+};
+
+/** Round status glyph. Always paired with text or an accessible label. */
+export function StatusIcon({ status, label }: { status: CaseStatus; label?: string }) {
+  return (
+    <span className={`status-icon status-${status}`} role="img" aria-label={label ?? STATUS[status].label}>
+      <Icon name={STATUS[status].icon} />
+    </span>
+  );
 }
 
-export function Metric({ label, value, hint, tone }: { label: string; value: ReactNode; hint?: string; tone?: "good" | "bad" | "warn" }) {
+export function StatusBadge({ status }: { status: CaseStatus }) {
   return (
-    <div className={`metric${tone ? ` metric-${tone}` : ""}`}>
-      <div className="metric-label">{label}</div>
-      <div className="metric-value">{value}</div>
-      {hint ? <div className="metric-hint">{hint}</div> : null}
+    <span className={`status-badge status-${status}`}>
+      <Icon name={STATUS[status].icon} />
+      {STATUS[status].label}
+    </span>
+  );
+}
+
+/** Horizontal pass / fail / error proportion bar. */
+export function ResultBar({ passed, failed, errored }: { passed: number; failed: number; errored: number }) {
+  const total = passed + failed + errored;
+  if (total === 0) return <div className="result-bar" aria-hidden="true" />;
+  return (
+    <div className="result-bar" aria-hidden="true">
+      {passed > 0 ? <span className="seg seg-pass" style={{ flexGrow: passed }} /> : null}
+      {failed > 0 ? <span className="seg seg-fail" style={{ flexGrow: failed }} /> : null}
+      {errored > 0 ? <span className="seg seg-error" style={{ flexGrow: errored }} /> : null}
     </div>
   );
 }
 
-export function Notice({ tone = "info", title, children }: { tone?: "info" | "error" | "warn"; title?: string; children?: ReactNode }) {
+export function Notice({
+  tone = "info",
+  title,
+  children,
+}: {
+  tone?: "info" | "error" | "warn";
+  title?: string;
+  children?: ReactNode;
+}) {
+  const icon: IconName = tone === "info" ? "info" : "alert";
   return (
     <div className={`notice notice-${tone}`} role={tone === "error" ? "alert" : "status"}>
-      {title ? <strong>{title}</strong> : null}
-      {children ? <div className="notice-body">{children}</div> : null}
+      <Icon name={icon} className="notice-icon" />
+      <div className="notice-content">
+        {title ? <strong className="notice-title">{title}</strong> : null}
+        {children ? <div className="notice-body">{children}</div> : null}
+      </div>
+    </div>
+  );
+}
+
+export function EmptyState({
+  icon,
+  title,
+  children,
+  action,
+}: {
+  icon: IconName;
+  title: string;
+  children?: ReactNode;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="empty">
+      <span className="empty-icon">
+        <Icon name={icon} />
+      </span>
+      <div>
+        <p className="empty-title">{title}</p>
+        {children ? <p className="empty-text">{children}</p> : null}
+        {action ? <div className="empty-action">{action}</div> : null}
+      </div>
     </div>
   );
 }

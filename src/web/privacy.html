@@ -7,7 +7,6 @@
     <meta name="description" content="How the EvalSprint public demo handles your data: suites stay in browser storage, evaluation requests are processed in memory, and no analytics or cookies are used." />
     <meta name="theme-color" content="#16181d" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="canonical" href="https://evalsprint.vercel.app/privacy" />
     <link rel="stylesheet" href="/site/site.css" />
   </head>
   <body>
@@ -18,7 +17,9 @@
         <p class="updated">Last updated: 9 October 2026</p>
 
         <p>
-          This policy describes how the public EvalSprint demo at <strong>evalsprint.vercel.app</strong> handles data. It
+          This policy describes how the public EvalSprint website and demo at <strong>pitchvio.info</strong> (also
+          reachable at the fallback address <strong>evalsprint.vercel.app</strong>) handle data, and how messages sent to
+          <a href="mailto:%CONTACT_EMAIL%">%CONTACT_EMAIL%</a> are handled. It
           is based on what the application's source code actually does, which you can inspect in the
           <a href="https://github.com/bhargavthaparbusiness/evalsprint">public repository</a>. EvalSprint is an
           open-source project maintained by the GitHub user
@@ -78,13 +79,26 @@
           instance is responsible for it.
         </p>
 
-        <h2>4. Hosting and logs</h2>
+        <h2>4. Hosting, DNS and logs</h2>
         <p>
-          The demo is hosted on <a href="https://vercel.com">Vercel</a>, which runs the server functions in the United
-          States (region <code>iad1</code>). Like any web host, Vercel receives standard request information such as
-          your IP address, user agent, the requested path and timestamps, and keeps platform logs under its own
+          The website and demo are hosted on <a href="https://vercel.com">Vercel</a>, which runs the server functions in
+          the United States (region <code>iad1</code>). Like any web host, Vercel receives standard request information
+          such as your IP address, user agent, the requested path and timestamps, and keeps platform logs under its own
           policies. See the <a href="https://vercel.com/legal/privacy-policy">Vercel Privacy Policy</a>. The maintainer
           can view these platform logs for operating and debugging the demo.
+        </p>
+        <p>
+          The domain's DNS is provided by <a href="https://www.cloudflare.com">Cloudflare</a>. DNS lookups resolve the
+          site to Vercel; website requests themselves are served by Vercel.
+        </p>
+
+        <h3>Email</h3>
+        <p>
+          If you email <a href="mailto:%CONTACT_EMAIL%">%CONTACT_EMAIL%</a>, the message is received by Cloudflare Email
+          Routing and forwarded to the maintainer's personal mailbox. Your email address, the message and any
+          attachments are then stored in that mailbox and used only to reply to you and handle your request. See the
+          <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare Privacy Policy</a>. Please don't send secrets or
+          sensitive personal information by email.
         </p>
 
         <h2>5. Cookies, analytics and third parties</h2>
@@ -92,7 +106,7 @@
           <li><strong>Cookies:</strong> EvalSprint does not set any cookies.</li>
           <li><strong>Analytics and tracking:</strong> none. The site includes no analytics, advertising or tracking scripts.</li>
           <li><strong>Third-party resources:</strong> the site loads no external scripts, fonts or images. Its Content Security Policy only allows resources from its own origin.</li>
-          <li><strong>Links:</strong> links to GitHub and Vercel take you to sites with their own privacy policies.</li>
+          <li><strong>Links:</strong> links to GitHub, Vercel and Cloudflare take you to sites with their own privacy policies.</li>
         </ul>
 
         <h2>6. Retention and deletion</h2>
@@ -100,11 +114,13 @@
           <li><strong>Browser data</strong> stays until you delete it. Use <em>Delete suite</em> in the app, or clear this site's data in your browser settings to remove everything.</li>
           <li><strong>Evaluation requests</strong> are not retained by the application after the response is sent.</li>
           <li><strong>Hosting logs</strong> are retained by Vercel according to its policies. The maintainer does not export or keep separate copies.</li>
+          <li><strong>Emails</strong> you send stay in the maintainer's mailbox until deleted. You can ask for your messages to be deleted by emailing <a href="mailto:%CONTACT_EMAIL%">%CONTACT_EMAIL%</a>.</li>
         </ul>
 
         <h2>7. Public demo versus self-hosted instances</h2>
         <p>
-          This policy covers only the public demo operated by the maintainer at evalsprint.vercel.app. EvalSprint is
+          This policy covers only the public website and demo operated by the maintainer at pitchvio.info (and its
+          fallback address evalsprint.vercel.app). EvalSprint is
           open-source software, and anyone can run their own copy. A self-hosted instance may be configured differently,
           for example with real AI providers enabled. Its operator, not the maintainer, is responsible for how it handles
           data.
@@ -118,8 +134,9 @@
 
         <h2>9. Contact</h2>
         <p>
-          For privacy questions, see the <a href="/contact">Contact page</a>. Issues on GitHub are public, so please don't
-          include personal or sensitive details in them.
+          For privacy questions or deletion requests, email <a href="mailto:%CONTACT_EMAIL%">%CONTACT_EMAIL%</a>. See
+          also the <a href="/contact">Contact page</a>. Issues on GitHub are public, so please don't include personal or
+          sensitive details in them.
         </p>
       </article>
     </main>

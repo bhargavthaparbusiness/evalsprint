@@ -3,6 +3,15 @@
   "version": "0.1.0",
   "description": "Regression testing and evaluation toolkit for LLM prompts: test suites, deterministic assertions, prompt comparison, mock and Anthropic providers.",
   "license": "MIT",
+  "homepage": "https://pitchvio.info",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bhargavthaparbusiness/evalsprint.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bhargavthaparbusiness/evalsprint/issues",
+    "email": "contact@pitchvio.info"
+  },
   "type": "module",
   "engines": {
     "node": ">=20.12"

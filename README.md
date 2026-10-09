@@ -4,7 +4,11 @@ Open-source regression testing for LLM prompts. Write test cases once, run any p
 
 EvalSprint is for developers who iterate on prompts and want something more repeatable than eyeballing outputs in a playground, without adopting a hosted evaluation platform. It runs locally: a small Node server, a web UI, and a CLI that all share one evaluation engine.
 
-**Live demo:** <https://evalsprint.vercel.app> (landing page) · <https://evalsprint.vercel.app/app> (the app, mock provider only)
+- **Website:** <https://pitchvio.info>
+- **Live demo app:** <https://pitchvio.info/app> (mock provider only — see [Deploy a preview to Vercel](#deploy-a-preview-to-vercel))
+- **Fallback deployment URL:** <https://evalsprint.vercel.app> (same deployment)
+- **Source:** <https://github.com/bhargavthaparbusiness/evalsprint>
+- **Contact:** [contact@pitchvio.info](mailto:contact@pitchvio.info)
 
 > **Status:** early MVP (v0.1). The feature set below is what exists today. See [Limitations](#limitations) and [Roadmap](#roadmap).
 
@@ -226,15 +230,17 @@ src/
   server/      node:http API (/api/providers, /api/run, /api/compare) + static/Vite serving
   cli/         CLI on top of core
   web/         Vite multi-page site
-    index.html     landing page (static HTML, no JS)
+    index.html     marketing landing page (static HTML; a tiny script only closes the mobile menu)
     app.html       the React evaluation app, served at /app; talks only to the server API
     privacy.html, terms.html, contact.html, about.html, 404.html
-    site/          shared header/footer (injected at build time) and site CSS
+    site/          shared header/footer, SEO metadata and site constants (injected at build time) and site CSS
 test/          Vitest tests
 examples/      Sample suite file
 ```
 
 Site routes: `/` landing, `/app` app, `/privacy`, `/terms`, `/contact`, `/about`; unknown paths return the 404 page with a 404 status. Clean URLs work the same locally and on Vercel (`cleanUrls` in `vercel.json`).
+
+The canonical public origin (`SITE_URL`, currently `https://pitchvio.info`) and the contact address live in `src/web/site/layout.ts`. At build time the `site-layout` Vite plugin uses them to add canonical, Open Graph and Twitter tags to every page and to generate `sitemap.xml` and `robots.txt`. The 404 page gets no canonical URL and is excluded from the sitemap.
 
 The web UI never evaluates anything itself: it posts the suite to the local server, which runs `core`. The CLI calls `core` directly.
 
@@ -251,7 +257,7 @@ npm run check       # lint + typecheck + test
 npm run build       # dist/ (server, CLI, core) + dist/web (UI)
 ```
 
-CI (`.github/workflows/ci.yml`) runs lint, typecheck, tests and build on every push to `main` and every pull request.
+CI (`.github/workflows/ci.yml`) runs lint, typecheck, tests and build on every push to `main` and every pull request. The tests use the mock provider and an SDK-shaped fake Anthropic client; they make no network calls and need no API key.
 
 ## Limitations
 
@@ -282,6 +288,14 @@ Issues and pull requests are welcome.
 4. Open a PR describing the change and how you verified it.
 
 Please don't commit `.env` files or API keys.
+
+## Contact
+
+- General and business enquiries: [contact@pitchvio.info](mailto:contact@pitchvio.info)
+- Bugs and feature requests: [GitHub Issues](https://github.com/bhargavthaparbusiness/evalsprint/issues)
+- Security issues: email the address above privately rather than opening a public issue.
+
+EvalSprint is maintained by one person, so replies may take a few days.
 
 ## License
 

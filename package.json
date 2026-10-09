@@ -6,10 +6,10 @@
   "homepage": "https://pitchvio.info",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bhargavthaparbusiness/evalsprint.git"
+    "url": "git+https://github.com/bhargavthaparbusiness/pitchvioevals.git"
   },
   "bugs": {
-    "url": "https://github.com/bhargavthaparbusiness/evalsprint/issues",
+    "url": "https://github.com/bhargavthaparbusiness/pitchvioevals/issues",
     "email": "contact@pitchvio.info"
   },
   "type": "module",

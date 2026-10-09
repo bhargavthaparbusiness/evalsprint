@@ -241,7 +241,7 @@ export function App() {
         </div>
         <a
           className="btn btn-ghost btn-icon hide-xs"
-          href="https://github.com/bhargavthaparbusiness/evalsprint"
+          href="https://github.com/bhargavthaparbusiness/pitchvioevals"
           aria-label="PitchvioEvals on GitHub"
           title="GitHub"
         >
@@ -493,8 +493,8 @@ export function App() {
         <span>PitchvioEvals · MIT · The public demo runs the mock provider only</span>
         <nav aria-label="Footer">
           <a href="/">Home</a>
-          <a href="https://github.com/bhargavthaparbusiness/evalsprint#readme">Docs</a>
-          <a href="https://github.com/bhargavthaparbusiness/evalsprint">GitHub</a>
+          <a href="https://github.com/bhargavthaparbusiness/pitchvioevals#readme">Docs</a>
+          <a href="https://github.com/bhargavthaparbusiness/pitchvioevals">GitHub</a>
           <a href="/about">About</a>
           <a href="/contact">Contact</a>
           <a href="/privacy">Privacy</a>

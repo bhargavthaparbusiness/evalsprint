@@ -1,9 +1,10 @@
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import type { RunResult, Suite } from "../../core/types.js";
 import { api, ApiError } from "../api";
 import type { RunTarget } from "../App";
 import { CaseDetail } from "./CaseDetail";
-import { formatMs, formatPercent, formatUsage, Metric, Notice, Spinner, StatusBadge } from "./ui";
+import { Icon } from "./Icon";
+import { formatMs, formatPercent, formatUsage, Notice, ResultBar, Spinner, StatusIcon } from "./ui";
 
 type State =
   | { status: "idle" }
@@ -41,41 +42,45 @@ export function RunView({ suite, blockedReason, target }: { suite: Suite; blocke
 
   const running = state.status === "running";
   const disabledReason = blockedReason ?? target.blockedReason;
+  const caseCount = suite.cases.length;
 
   return (
-    <section aria-labelledby="run-heading">
+    <section className="view" aria-labelledby="run-heading">
       <div className="toolbar">
-        <h2 id="run-heading" className="section-title">
-          Run evaluation
-        </h2>
+        <div className="toolbar-title">
+          <h2 id="run-heading">Run evaluation</h2>
+          <p>
+            Render each case into the prompt, call the provider, check every assertion.
+          </p>
+        </div>
         <div className="toolbar-controls">
           <label className="inline-field">
-            <span>Prompt version</span>
+            <span>Prompt</span>
             <select value={effectivePromptId} onChange={(e) => setPromptId(e.target.value)} disabled={running}>
               {suite.prompts.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name} ({p.id})
+                  {p.name}
                 </option>
               ))}
             </select>
           </label>
-          <button className="btn btn-primary" onClick={run} disabled={running || Boolean(disabledReason)}>
-            {running ? (
-              <>
-                <Spinner /> Running {suite.cases.length} case{suite.cases.length === 1 ? "" : "s"}…
-              </>
-            ) : (
-              "Run evaluations"
-            )}
+          <button className="btn btn-primary run-btn" onClick={run} disabled={running || Boolean(disabledReason)}>
+            {running ? <Spinner /> : <Icon name="play" />}
+            {running ? `Running ${caseCount} case${caseCount === 1 ? "" : "s"}…` : "Run evaluations"}
           </button>
         </div>
       </div>
 
-      {disabledReason ? <Notice tone="warn" title="Can't run yet">{disabledReason}</Notice> : null}
+      {disabledReason ? (
+        <Notice tone="warn" title="Can't run yet">
+          {disabledReason}
+        </Notice>
+      ) : null}
       {target.provider === "anthropic" && !disabledReason ? (
-        <p className="muted small">
-          This makes {suite.cases.length} real API call{suite.cases.length === 1 ? "" : "s"} to{" "}
-          <code>{target.model || "the default model"}</code>, billed to the key configured on the server.
+        <p className="cost-note">
+          <Icon name="info" />
+          Makes {caseCount} real API call{caseCount === 1 ? "" : "s"} to{" "}
+          <code>{target.model || "the default model"}</code>, billed to the server's API key.
         </p>
       ) : null}
 
@@ -91,15 +96,29 @@ export function RunView({ suite, blockedReason, target }: { suite: Suite; blocke
         </Notice>
       ) : null}
 
-      {state.status === "idle" ? (
-        <div className="empty">
-          <p>
-            <strong>No results yet.</strong> Pick a prompt version and press <em>Run evaluations</em>. Each test case's
-            variables are rendered into the prompt, sent to the selected provider, and the response is checked against
-            the case's assertions.
-          </p>
+      {state.status === "idle" || state.status === "error" ? (
+        <div className="panel">
+          <div className="panel-head">
+            <span>
+              {caseCount} test case{caseCount === 1 ? "" : "s"} ready
+            </span>
+            <span className="muted mono">{selectedPrompt?.id}</span>
+          </div>
+          <ul className="pending-list">
+            {suite.cases.map((c) => (
+              <li key={c.id}>
+                <span className="pending-dot" aria-hidden="true" />
+                <span className="row-name">{c.name || c.id}</span>
+                <span className="row-meta mono">
+                  {c.assertions.length} check{c.assertions.length === 1 ? "" : "s"}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
       ) : null}
+
+      {running ? <SkeletonRows count={caseCount} /> : null}
 
       {state.status === "done" ? (
         <RunResults
@@ -110,6 +129,20 @@ export function RunView({ suite, blockedReason, target }: { suite: Suite; blocke
         />
       ) : null}
     </section>
+  );
+}
+
+function SkeletonRows({ count }: { count: number }) {
+  return (
+    <div className="panel" aria-busy="true" aria-label="Running evaluations">
+      {Array.from({ length: Math.min(count, 8) }, (_, i) => (
+        <div key={i} className="skeleton-row">
+          <span className="skeleton skeleton-dot" />
+          <span className="skeleton skeleton-line" />
+          <span className="skeleton skeleton-short" />
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -125,101 +158,102 @@ export function RunResults({
   onToggle: (id: string) => void;
 }) {
   const s = result.summary;
+  const allPassed = s.passed === s.total;
   return (
     <div className="results">
-      {stale ? (
-        <Notice tone="info">The suite has been edited since this run. Run again to see current results.</Notice>
-      ) : null}
+      {stale ? <Notice tone="info">The suite changed since this run. Run again to see current results.</Notice> : null}
+
+      <div className="summary">
+        <div className="summary-score">
+          <div className="summary-label">Pass rate</div>
+          <div className={`summary-rate ${allPassed ? "is-pass" : "is-fail"}`}>{formatPercent(s.passRate)}</div>
+          <ResultBar passed={s.passed} failed={s.failed} errored={s.errored} />
+          <div className="summary-caption">
+            <span className="mono">
+              {s.passed}/{s.total}
+            </span>{" "}
+            cases passed · {result.promptName}
+          </div>
+        </div>
+        <dl className="summary-stats">
+          <div>
+            <dt>
+              <span className="legend legend-pass" /> Passed
+            </dt>
+            <dd>{s.passed}</dd>
+          </div>
+          <div>
+            <dt>
+              <span className="legend legend-fail" /> Failed
+            </dt>
+            <dd>{s.failed}</dd>
+          </div>
+          <div>
+            <dt>
+              <span className="legend legend-error" /> Errored
+            </dt>
+            <dd>{s.errored}</dd>
+          </div>
+          <div>
+            <dt>Duration</dt>
+            <dd>{formatMs(s.durationMs)}</dd>
+          </div>
+          <div className="summary-wide">
+            <dt>Tokens</dt>
+            <dd className={s.usage ? "" : "muted"}>{s.usage ? formatUsage(s.usage) : "Not reported"}</dd>
+          </div>
+        </dl>
+      </div>
+
       <div className="run-meta">
-        <span>
-          <strong>{result.promptName}</strong> · {result.provider === "mock" ? "Mock provider (fixture outputs)" : `Anthropic · ${result.model ?? ""}`}
+        <span className="provider-chip">
+          <Icon name={result.provider === "mock" ? "flask" : "plug"} />
+          {result.provider === "mock" ? "Mock provider · fixture outputs" : `Anthropic · ${result.model ?? ""}`}
         </span>
         <span className="muted">{new Date(result.startedAt).toLocaleString()}</span>
       </div>
-      <div className="metrics">
-        <Metric label="Pass rate" value={formatPercent(s.passRate)} tone={s.passed === s.total ? "good" : "bad"} />
-        <Metric label="Passed" value={`${s.passed} / ${s.total}`} />
-        <Metric label="Failed" value={s.failed} tone={s.failed > 0 ? "bad" : undefined} />
-        <Metric label="Errored" value={s.errored} tone={s.errored > 0 ? "warn" : undefined} />
-        <Metric label="Duration" value={formatMs(s.durationMs)} />
-        <Metric
-          label="Tokens"
-          value={s.usage ? formatUsage(s.usage) : "—"}
-          hint={s.usage ? "as reported by the provider" : "not reported by this provider"}
-        />
-      </div>
 
-      <div className="table-wrap">
-        <table className="table">
-          <thead>
-            <tr>
-              <th scope="col">Status</th>
-              <th scope="col">Test case</th>
-              <th scope="col">Checks</th>
-              <th scope="col" className="num">
-                Latency
-              </th>
-              <th scope="col" className="num">
-                Tokens
-              </th>
-              <th scope="col">
-                <span className="sr-only">Details</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {result.results.map((r) => {
-              const open = expanded.has(r.caseId);
-              const passedChecks = r.assertions.filter((a) => a.passed).length;
-              return (
-                <Fragment key={r.caseId}>
-                  <tr className={`row-${r.status}${open ? " row-open" : ""}`} onClick={() => onToggle(r.caseId)}>
-                    <td data-label="Status">
-                      <StatusBadge status={r.status} />
-                    </td>
-                    <td data-label="Test case">
-                      <div className="cell-title">{r.caseName}</div>
-                      <div className="cell-sub mono">{r.caseId}</div>
-                    </td>
-                    <td data-label="Checks">
-                      {r.error ? (
-                        <span className="error-text">{r.error}</span>
-                      ) : (
-                        `${passedChecks}/${r.assertions.length} passed`
-                      )}
-                    </td>
-                    <td data-label="Latency" className="num">
-                      {formatMs(r.latencyMs)}
-                    </td>
-                    <td data-label="Tokens" className="num">
-                      {formatUsage(r.usage)}
-                    </td>
-                    <td className="num">
-                      <button
-                        className="btn btn-ghost btn-sm"
-                        aria-expanded={open}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onToggle(r.caseId);
-                        }}
-                      >
-                        {open ? "Hide" : "Details"}
-                      </button>
-                    </td>
-                  </tr>
-                  {open ? (
-                    <tr className="detail-row">
-                      <td colSpan={6}>
-                        <CaseDetail result={r} provider={result.provider} />
-                      </td>
-                    </tr>
-                  ) : null}
-                </Fragment>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      <ul className="result-list">
+        {result.results.map((r) => {
+          const open = expanded.has(r.caseId);
+          const detailId = `detail-${r.caseId}`;
+          return (
+            <li key={r.caseId} className={`result-row is-${r.status}${open ? " is-open" : ""}`}>
+              <button className="row-button" aria-expanded={open} aria-controls={detailId} onClick={() => onToggle(r.caseId)}>
+                <StatusIcon status={r.status} />
+                <span className="row-main">
+                  <span className="row-name">{r.caseName}</span>
+                  <span className="row-sub mono">{r.caseId}</span>
+                </span>
+                <span className="row-checks">
+                  {r.error ? (
+                    <span className="row-error">Error</span>
+                  ) : (
+                    <>
+                      <span className="check-dots" aria-hidden="true">
+                        {r.assertions.map((a, i) => (
+                          <span key={i} className={a.passed ? "dot-pass" : "dot-fail"} />
+                        ))}
+                      </span>
+                      <span className="mono">
+                        {r.assertions.filter((a) => a.passed).length}/{r.assertions.length}
+                      </span>
+                    </>
+                  )}
+                </span>
+                <span className="row-meta mono hide-sm">{formatMs(r.latencyMs)}</span>
+                <Icon name="chevronDown" className="row-chevron" />
+              </button>
+              {open ? (
+                <div id={detailId} className="row-detail">
+                  <CaseDetail result={r} provider={result.provider} />
+                </div>
+              ) : null}
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
+

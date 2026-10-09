@@ -1,6 +1,7 @@
 import type { PromptVersion, Suite } from "../../core/types.js";
 import { extractVariables } from "../../core/template.js";
 import { uniqueId } from "../ids";
+import { Icon } from "./Icon";
 import { Field } from "./ui";
 
 export function PromptsEditor({ suite, onChange }: { suite: Suite; onChange: (suite: Suite) => void }) {
@@ -42,37 +43,48 @@ export function PromptsEditor({ suite, onChange }: { suite: Suite; onChange: (su
   }
 
   return (
-    <section aria-labelledby="prompts-heading">
+    <section className="view" aria-labelledby="prompts-heading">
       <div className="toolbar">
-        <h2 id="prompts-heading" className="section-title">
-          Prompt versions
-        </h2>
-        <button className="btn" onClick={() => add()}>
-          Add prompt version
-        </button>
+        <div className="toolbar-title">
+          <h2 id="prompts-heading">
+            Prompt versions <span className="count">{suite.prompts.length}</span>
+          </h2>
+          <p>
+            Use <code>{"{{variable}}"}</code> placeholders. A case missing a variable is reported as an error instead of
+            sending an incomplete prompt.
+          </p>
+        </div>
+        <div className="toolbar-controls">
+          <button className="btn" onClick={() => add()}>
+            <Icon name="plus" />
+            Add version
+          </button>
+        </div>
       </div>
-      <p className="muted small">
-        Use <code>{"{{variable}}"}</code> placeholders; each test case supplies the values. A case that is missing a
-        variable is reported as an error instead of sending an incomplete prompt.
-      </p>
       <div className="stack">
         {suite.prompts.map((prompt, index) => {
           const vars = [...new Set([...extractVariables(prompt.system ?? ""), ...extractVariables(prompt.template)])];
           return (
             <article key={index} className="card">
               <div className="card-head">
-                <h3 className="card-title">{prompt.name || "Untitled prompt"}</h3>
+                <h3 className="card-title">
+                  <Icon name="prompt" />
+                  {prompt.name || "Untitled prompt"}
+                  <span className="id-chip mono">{prompt.id}</span>
+                </h3>
                 <div className="card-actions">
-                  <button className="btn btn-sm" onClick={() => add(prompt)}>
-                    Duplicate
+                  <button className="btn btn-sm btn-ghost" onClick={() => add(prompt)}>
+                    <Icon name="copy" />
+                    <span className="hide-xs">Duplicate</span>
                   </button>
                   <button
-                    className="btn btn-sm btn-danger"
+                    className="btn btn-sm btn-ghost btn-danger"
+                    aria-label="Delete prompt version"
                     onClick={() => remove(index)}
                     disabled={suite.prompts.length <= 1}
-                    title={suite.prompts.length <= 1 ? "A suite needs at least one prompt version" : undefined}
+                    title={suite.prompts.length <= 1 ? "A suite needs at least one prompt version" : "Delete prompt version"}
                   >
-                    Delete
+                    <Icon name="trash" />
                   </button>
                 </div>
               </div>
@@ -96,12 +108,13 @@ export function PromptsEditor({ suite, onChange }: { suite: Suite; onChange: (su
                 hint={
                   vars.length > 0 ? (
                     <>
-                      Variables:{" "}
-                      {vars.map((v) => (
-                        <code key={v} className="chip">
-                          {v}
-                        </code>
-                      ))}
+                      <span className="chips">
+                        {vars.map((v) => (
+                          <code key={v} className="chip">
+                            {v}
+                          </code>
+                        ))}
+                      </span>
                     </>
                   ) : (
                     "No variables yet."

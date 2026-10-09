@@ -2,199 +2,342 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>EvalSprint — Regression tests for LLM prompts</title>
     <meta name="description" content="EvalSprint is an open-source tool for evaluating and comparing LLM prompts against repeatable test cases with deterministic assertions, a mock provider, a CLI, and optional Anthropic integration." />
-    <meta name="theme-color" content="#16181d" />
+    <meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0c0d0f" media="(prefers-color-scheme: dark)" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="canonical" href="https://evalsprint.vercel.app/" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="EvalSprint — Regression tests for LLM prompts" />
-    <meta property="og:description" content="Write test cases once, run any prompt version against them, and see exactly which cases pass, fail, and why." />
+    <meta property="og:title" content="EvalSprint — Know exactly what your prompt change broke" />
+    <meta property="og:description" content="Run every prompt version against the same test cases, check each response with deterministic assertions, and see which cases were fixed or regressed." />
     <meta property="og:url" content="https://evalsprint.vercel.app/" />
-    <meta property="og:image" content="https://evalsprint.vercel.app/screenshots/run.jpg" />
+    <meta property="og:image" content="https://evalsprint.vercel.app/screenshots/compare.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="stylesheet" href="/site/site.css" />
   </head>
   <body>
     <!-- @header -->
     <main id="main">
-      <section class="hero">
-        <div class="container">
-          <p class="eyebrow">Open source · MIT licensed</p>
-          <h1>Catch prompt regressions before you ship them.</h1>
-          <p class="lead">
-            EvalSprint runs your LLM prompts against repeatable test cases, checks every response with deterministic
-            assertions, and shows exactly which cases a prompt change fixes or breaks.
+      <!-- ============ HERO ============ -->
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-grid" aria-hidden="true"></div>
+        <div class="container hero-inner">
+          <a class="hero-badge" href="https://github.com/bhargavthaparbusiness/evalsprint">
+            <span class="badge-dot" aria-hidden="true"></span>
+            Open source · MIT · v0.1
+            <!-- icon:arrowRight -->
+          </a>
+          <h1 id="hero-title" class="hero-title">Know exactly what your <br class="br-md" />prompt change broke.</h1>
+          <p class="hero-lead">
+            EvalSprint runs every prompt version against the same test cases, checks each response with deterministic
+            assertions, and shows which cases got fixed — and which quietly regressed.
           </p>
           <div class="hero-actions">
-            <a class="btn btn-primary" href="/app">Try the demo</a>
-            <a class="btn" href="https://github.com/bhargavthaparbusiness/evalsprint">View on GitHub</a>
+            <a class="btn btn-primary btn-lg" href="/app">Open the app <!-- icon:arrowRight --></a>
+            <a class="btn btn-lg" href="https://github.com/bhargavthaparbusiness/evalsprint"><!-- icon:github --> View on GitHub</a>
           </div>
-          <p class="hero-note">The demo runs in your browser with the mock provider: no sign-up, no API key, no model calls.</p>
-          <figure class="shot hero-shot">
-            <img src="/screenshots/run.jpg" width="1280" height="800" alt="EvalSprint dashboard after running the sample suite: 25% pass rate, with failing cases expanded to show which assertions failed and why." />
-            <figcaption>The EvalSprint dashboard running the built-in sample suite on the mock provider.</figcaption>
+          <p class="hero-note"><!-- icon:flask --> Runs in your browser on the mock provider. No sign-up, no API key.</p>
+        </div>
+
+        <!-- Product preview: a static rendering of the Compare view, using the real sample-suite results. -->
+        <div class="container">
+          <figure class="preview" aria-labelledby="preview-caption">
+            <div class="preview-window">
+              <div class="preview-bar">
+                <span class="preview-crumb"><!-- icon:folder --> <span class="crumb-suite">Support ticket summarizer <span class="slash">/</span></span> <strong>Compare</strong></span>
+                <span class="preview-chip"><!-- icon:flask --> Mock</span>
+              </div>
+              <div class="preview-body">
+                <div class="pv-summary">
+                  <div class="pv-version">
+                    <div class="pv-head"><span class="vtag">A</span> v1 — baseline</div>
+                    <div class="pv-rate">25%</div>
+                    <div class="bar" aria-hidden="true"><span class="b-pass g1"></span><span class="b-fail g3"></span></div>
+                    <div class="pv-cap"><span class="mono">1/4</span> passed</div>
+                  </div>
+                  <div class="pv-delta">
+                    <!-- icon:fix -->
+                    <span class="pv-delta-value">+50 pts</span>
+                    <span class="pv-delta-label">A → B</span>
+                  </div>
+                  <div class="pv-version">
+                    <div class="pv-head"><span class="vtag vtag-b">B</span> v2 — structured</div>
+                    <div class="pv-rate">75%</div>
+                    <div class="bar" aria-hidden="true"><span class="b-pass g3"></span><span class="b-fail g1"></span></div>
+                    <div class="pv-cap"><span class="mono">3/4</span> passed</div>
+                  </div>
+                </div>
+
+                <ul class="pv-rows">
+                  <li class="pv-row is-fixed">
+                    <span class="pv-name"><span class="pv-text">Login outage is P1</span><span class="pv-id mono">login-outage</span></span>
+                    <span class="pv-trans"><span class="st st-fail" title="fail"><!-- icon:x --></span><!-- icon:arrowRight --><span class="st st-pass" title="pass"><!-- icon:check --></span></span>
+                    <span class="chg chg-fixed"><!-- icon:fix --><span class="chg-label">Fixed</span></span>
+                  </li>
+                  <li class="pv-row is-fixed">
+                    <span class="pv-name"><span class="pv-text">Billing issue without refund promise</span><span class="pv-id mono">refund-request</span></span>
+                    <span class="pv-trans"><span class="st st-fail"><!-- icon:x --></span><!-- icon:arrowRight --><span class="st st-pass"><!-- icon:check --></span></span>
+                    <span class="chg chg-fixed"><!-- icon:fix --><span class="chg-label">Fixed</span></span>
+                  </li>
+                  <li class="pv-row is-regressed is-open">
+                    <span class="pv-name"><span class="pv-text">Feature request is P3</span><span class="pv-id mono">feature-request</span></span>
+                    <span class="pv-trans"><span class="st st-pass"><!-- icon:check --></span><!-- icon:arrowRight --><span class="st st-fail"><!-- icon:x --></span></span>
+                    <span class="chg chg-regressed"><!-- icon:regress --><span class="chg-label">Regressed</span></span>
+                  </li>
+                  <li class="pv-detail">
+                    <div class="pv-assert"><span class="am am-pass"><!-- icon:check --></span>contains "T-1003" — found at position 1</div>
+                    <div class="pv-assert"><span class="am am-fail"><!-- icon:x --></span>matches /\bP3\b/ — no match in output</div>
+                    <pre class="pv-output"><code>[T-1003] <mark>P2</mark> — Customer asks for CSV export of the usage report.</code></pre>
+                  </li>
+                  <li class="pv-row is-fixed">
+                    <span class="pv-name"><span class="pv-text">Vague ticket asks for details</span><span class="pv-id mono">vague-ticket</span></span>
+                    <span class="pv-trans"><span class="st st-fail"><!-- icon:x --></span><!-- icon:arrowRight --><span class="st st-pass"><!-- icon:check --></span></span>
+                    <span class="chg chg-fixed"><!-- icon:fix --><span class="chg-label">Fixed</span></span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <figcaption id="preview-caption">
+              The built-in sample suite: the structured prompt fixes three cases and regresses one.
+              <a href="/app">Run it yourself <!-- icon:arrowRight --></a>
+            </figcaption>
           </figure>
         </div>
       </section>
 
-      <section class="section" aria-labelledby="problem-heading">
-        <div class="container grid-2">
-          <div>
-            <p class="eyebrow">The problem</p>
-            <h2 id="problem-heading">Prompt changes are code changes without tests.</h2>
-            <p class="section-intro">
-              A small wording change can fix one behaviour and quietly break another. Checking outputs by hand in a
-              playground doesn't scale, and it isn't repeatable.
-            </p>
+      <!-- ============ PROBLEM ============ -->
+      <section class="band band-ink" aria-labelledby="problem-title">
+        <div class="container">
+          <p class="eyebrow">The problem</p>
+          <h2 id="problem-title" class="statement">A prompt change is a code change. <span class="dim">It just doesn't come with tests.</span></h2>
+          <div class="problem-grid">
+            <div class="problem">
+              <span class="problem-num mono">01</span>
+              <h3>Silent regressions</h3>
+              <p>Tightening one instruction fixes the case you were looking at — and breaks one you weren't.</p>
+            </div>
+            <div class="problem">
+              <span class="problem-num mono">02</span>
+              <h3>Unrepeatable checks</h3>
+              <p>Eyeballing outputs in a playground gives a different verdict depending on who looks, and when.</p>
+            </div>
+            <div class="problem">
+              <span class="problem-num mono">03</span>
+              <h3>Scores without reasons</h3>
+              <p>A single quality number says something changed. It doesn't say what, or why.</p>
+            </div>
           </div>
-          <div class="card">
-            <h3>Built for developers who</h3>
-            <ul class="problem-list">
-              <li>iterate on system prompts and templates for an LLM feature,</li>
-              <li>want a fast, local check before merging a prompt change,</li>
-              <li>need results that are explainable, not just a score,</li>
-              <li>would rather keep test data in a JSON file than in a hosted platform.</li>
+        </div>
+      </section>
+
+      <!-- ============ HOW IT WORKS ============ -->
+      <section class="section" id="how" aria-labelledby="how-title">
+        <div class="container">
+          <div class="section-head">
+            <p class="eyebrow">How it works</p>
+            <h2 id="how-title">One suite file. Three steps.</h2>
+            <p class="section-lead">Test cases live next to your prompts as plain JSON. The same file runs in the web app and the CLI.</p>
+          </div>
+          <ol class="steps">
+            <li class="step">
+              <div class="step-head"><span class="step-n mono">1</span><h3>Define cases</h3></div>
+              <p>Each case supplies template variables and the assertions its output must satisfy.</p>
+              <pre class="snippet"><code><span class="t-key">"vars"</span>: { <span class="t-key">"ticket_id"</span>: <span class="t-str">"T-1002"</span> },
+<span class="t-key">"assertions"</span>: [
+  { <span class="t-key">"type"</span>: <span class="t-str">"contains"</span>,
+    <span class="t-key">"value"</span>: <span class="t-str">"T-1002"</span> },
+  { <span class="t-key">"type"</span>: <span class="t-str">"not-contains"</span>,
+    <span class="t-key">"value"</span>: <span class="t-str">"we will refund"</span> }
+]</code></pre>
+            </li>
+            <li class="step">
+              <div class="step-head"><span class="step-n mono">2</span><h3>Run a version</h3></div>
+              <p>Every case is rendered, sent to the provider, and checked — with a reason for each result.</p>
+              <div class="mini">
+                <div class="mini-row"><span class="am am-fail"><!-- icon:x --></span><span>contains "T-1002" — substring not found in output</span></div>
+                <div class="mini-row"><span class="am am-fail"><!-- icon:x --></span><span>does not contain "we will refund" — forbidden substring found at position 45</span></div>
+                <div class="mini-row"><span class="am am-fail"><!-- icon:x --></span><span>matches /\bP[23]\b/ — no match in output</span></div>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-head"><span class="step-n mono">3</span><h3>Compare versions</h3></div>
+              <p>Run two versions on the same cases to see what a change fixed — and what it broke.</p>
+              <div class="mini">
+                <div class="mini-row mini-trans"><span>Billing issue…</span><span class="st st-fail"><!-- icon:x --></span><!-- icon:arrowRight --><span class="st st-pass"><!-- icon:check --></span><span class="chg chg-fixed"><!-- icon:fix --></span></div>
+                <div class="mini-row mini-trans"><span>Feature request…</span><span class="st st-pass"><!-- icon:check --></span><!-- icon:arrowRight --><span class="st st-fail"><!-- icon:x --></span><span class="chg chg-regressed"><!-- icon:regress --></span></div>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- ============ ASSERTIONS ============ -->
+      <section class="section section-surface" id="assertions" aria-labelledby="assert-title">
+        <div class="container split">
+          <div class="split-copy">
+            <p class="eyebrow">Assertions</p>
+            <h2 id="assert-title">Checks that explain themselves.</h2>
+            <p class="section-lead">Five deterministic assertion types. A case passes only when every assertion passes, and each result tells you exactly why.</p>
+            <ul class="ticks">
+              <li><!-- icon:check --><span>Same input, same verdict — no model grading the model.</span></li>
+              <li><!-- icon:check --><span>Invalid regexes and missing variables are caught before anything runs.</span></li>
+              <li><!-- icon:check --><span>Case-sensitivity, trimming and regex flags are explicit.</span></li>
             </ul>
           </div>
+          <div class="spec" role="table" aria-label="Assertion types with example results">
+            <div class="spec-row spec-headrow" role="row">
+              <span role="columnheader">Type</span><span role="columnheader">Example</span><span role="columnheader">Result</span>
+            </div>
+            <div class="spec-row" role="row">
+              <code role="cell">contains</code><span class="mono" role="cell">"T-1002"</span>
+              <span role="cell" class="spec-res"><span class="am am-pass"><!-- icon:check --></span>found at position 1</span>
+            </div>
+            <div class="spec-row" role="row">
+              <code role="cell">not-contains</code><span class="mono" role="cell">"we will refund"</span>
+              <span role="cell" class="spec-res"><span class="am am-fail"><!-- icon:x --></span>forbidden substring found at position 45</span>
+            </div>
+            <div class="spec-row" role="row">
+              <code role="cell">equals</code><span class="mono" role="cell">"yes"</span>
+              <span role="cell" class="spec-res"><span class="am am-pass"><!-- icon:check --></span>output matches exactly</span>
+            </div>
+            <div class="spec-row" role="row">
+              <code role="cell">regex</code><span class="mono" role="cell">/\bP[23]\b/</span>
+              <span role="cell" class="spec-res"><span class="am am-fail"><!-- icon:x --></span>no match in output</span>
+            </div>
+            <div class="spec-row" role="row">
+              <code role="cell">max-length</code><span class="mono" role="cell">200</span>
+              <span role="cell" class="spec-res"><span class="am am-pass"><!-- icon:check --></span>output is 61 characters</span>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section class="section" aria-labelledby="how-heading">
+      <!-- ============ COMPARISON ============ -->
+      <section class="section" id="compare" aria-labelledby="compare-title">
         <div class="container">
-          <p class="eyebrow">How it works</p>
-          <h2 id="how-heading">Three steps, one suite file.</h2>
-          <div class="grid-3">
-            <div class="card">
-              <div class="step-num" aria-hidden="true">1</div>
-              <h3>Define test cases</h3>
-              <p>Each case supplies template variables and the assertions its output must satisfy.</p>
-            </div>
-            <div class="card">
-              <div class="step-num" aria-hidden="true">2</div>
-              <h3>Run a prompt version</h3>
-              <p>Every case is rendered, sent to the provider, and checked. Each assertion explains its result.</p>
-            </div>
-            <div class="card">
-              <div class="step-num" aria-hidden="true">3</div>
-              <h3>Compare versions</h3>
-              <p>Run two prompt versions on the same cases and see pass rates and exactly which cases changed.</p>
-            </div>
+          <div class="section-head">
+            <p class="eyebrow">Prompt comparison</p>
+            <h2 id="compare-title">Every case, before and after.</h2>
+            <p class="section-lead">Both versions run against identical cases and assertions. You get the pass-rate delta, a per-case transition, and both outputs side by side.</p>
+          </div>
+          <figure class="shot">
+            <img src="/screenshots/compare.jpg" width="1440" height="900" loading="lazy" alt="EvalSprint's Compare view: version A at 25%, version B at 75%, plus 50 points, three cases fixed and one regressed, with the regressed case expanded to show both outputs." />
+          </figure>
+          <div class="callouts">
+            <div class="callout-item"><!-- icon:fix --><div><h3>Pass-rate delta</h3><p>A single number for the change, backed by the cases that moved it.</p></div></div>
+            <div class="callout-item"><!-- icon:compare --><div><h3>Per-case transitions</h3><p>Each case is marked fixed, regressed or unchanged — regressions are never averaged away.</p></div></div>
+            <div class="callout-item"><!-- icon:braces --><div><h3>Both outputs, side by side</h3><p>Expand any case to see each version's output and assertion results together.</p></div></div>
           </div>
         </div>
       </section>
 
-      <section class="section" id="features" aria-labelledby="features-heading">
+      <!-- ============ PROVIDERS ============ -->
+      <section class="section section-surface" id="providers" aria-labelledby="providers-title">
         <div class="container">
-          <p class="eyebrow">Features</p>
-          <h2 id="features-heading">What's in the box</h2>
-          <p class="section-intro">Everything below exists in the current release (v0.1). See the README for limitations and the roadmap.</p>
-          <div class="grid-3">
-            <div class="card">
-              <h3>Deterministic assertions</h3>
-              <p><code>contains</code>, <code>not-contains</code>, <code>equals</code>, <code>regex</code> and <code>max-length</code>. A case passes only if every assertion passes, and failures say why.</p>
+          <div class="section-head">
+            <p class="eyebrow">Providers</p>
+            <h2 id="providers-title">Start free and deterministic. <br class="br-md" />Add a real model when you're ready.</h2>
+          </div>
+          <div class="providers">
+            <div class="provider">
+              <div class="provider-head">
+                <span class="provider-icon"><!-- icon:flask --></span>
+                <div><h3>Mock</h3><span class="provider-tag">Default · no key needed</span></div>
+              </div>
+              <ul class="ticks">
+                <li><!-- icon:check --><span>Returns fixture outputs written into the suite</span></li>
+                <li><!-- icon:check --><span>Free and fully repeatable — ideal for CI and demos</span></li>
+                <li><!-- icon:check --><span>Clearly labelled as not generated by a model</span></li>
+                <li><!-- icon:check --><span>Can simulate provider errors with <code>!error:</code> fixtures</span></li>
+              </ul>
             </div>
-            <div class="card">
-              <h3>Mock mode</h3>
-              <p>A deterministic provider that returns fixture outputs stored in the suite. Free, repeatable, and clearly labelled as not generated by a model.</p>
-            </div>
-            <div class="card">
-              <h3>Prompt comparison</h3>
-              <p>Side-by-side pass rates, the change in points, and per-case <em>fixed</em> / <em>regressed</em> labels with both outputs.</p>
-            </div>
-            <div class="card">
-              <h3>CLI</h3>
-              <p><code>init</code>, <code>validate</code>, <code>run</code> and <code>compare</code>, with JSON output and exit codes you can use in CI.</p>
-            </div>
-            <div class="card">
-              <h3>Anthropic integration <span class="tag">optional</span></h3>
-              <p>Real model calls through the official SDK on your own instance, with the key read from the server environment only. Disabled on the public demo.</p>
-            </div>
-            <div class="card">
-              <h3>Local-first</h3>
-              <p>Suites are plain JSON. The web app keeps them in your browser, and they import and export straight into the CLI.</p>
+            <div class="provider">
+              <div class="provider-head">
+                <span class="provider-icon"><!-- icon:plug --></span>
+                <div><h3>Anthropic</h3><span class="provider-tag">Optional · your own instance</span></div>
+              </div>
+              <ul class="ticks">
+                <li><!-- icon:check --><span>Real calls through the official Anthropic SDK</span></li>
+                <li><!-- icon:check --><span>API key read from the server environment only</span></li>
+                <li><!-- icon:check --><span>Latency, tokens and model recorded only when reported</span></li>
+                <li><!-- icon:check --><span>Clear messages for auth, rate-limit and model errors</span></li>
+              </ul>
             </div>
           </div>
+          <p class="fineprint"><!-- icon:lock --> The public demo runs the mock provider only — Anthropic is disabled on its server regardless of configuration.</p>
         </div>
       </section>
 
-      <section class="section" aria-labelledby="preview-heading">
-        <div class="container">
-          <p class="eyebrow">Preview</p>
-          <h2 id="preview-heading">See why a prompt change helped or hurt.</h2>
-          <p class="section-intro">Screenshots of the actual app running the sample suite. The comparison shows the structured prompt fixing three cases and regressing one.</p>
-          <div class="shots-grid">
-            <figure class="shot">
-              <img src="/screenshots/compare.jpg" width="1280" height="800" loading="lazy" alt="Comparison view: version A at 25%, version B at 75%, a change of plus 50 points, with one case marked regressed and its two outputs shown side by side." />
-              <figcaption>Comparing two prompt versions on the same cases.</figcaption>
-            </figure>
-            <figure class="shot">
-              <img src="/screenshots/mobile.jpg" width="390" height="844" loading="lazy" alt="The EvalSprint dashboard on a phone-sized screen, showing run metrics and stacked result cards." />
-              <figcaption>The same app on a phone.</figcaption>
-            </figure>
+      <!-- ============ CLI ============ -->
+      <section class="band band-ink" id="cli" aria-labelledby="cli-title">
+        <div class="container split split-cli">
+          <div class="split-copy">
+            <p class="eyebrow">CLI</p>
+            <h2 id="cli-title">Same engine in your terminal and CI.</h2>
+            <p class="section-lead">The CLI runs the exact suite file you edit in the app — <code>init</code>, <code>validate</code>, <code>run</code> and <code>compare</code>.</p>
+            <dl class="exit-codes">
+              <div><dt class="mono">0</dt><dd>every case passed</dd></div>
+              <div><dt class="mono">1</dt><dd>a case failed or errored</dd></div>
+              <div><dt class="mono">2</dt><dd>usage or config error</dd></div>
+            </dl>
+            <p class="fineprint">Add <code>--json</code> for machine-readable results.</p>
           </div>
+          <figure class="terminal" aria-label="Real output of the compare command on the sample suite">
+            <div class="terminal-bar"><!-- icon:terminal --> <span>Terminal</span></div>
+<pre class="terminal-body"><code><span class="t-prompt">$</span> npm run evalsprint -- compare \
+    examples/support-tickets.json --a baseline --b structured
+
+<span class="t-strong">Compare: v1 — baseline  vs  v2 — structured</span>
+
+  Login outage is P1                    fail  → pass   <span class="t-pass">fixed</span>
+  Billing issue without refund promise  fail  → pass   <span class="t-pass">fixed</span>
+  Feature request is P3                 pass  → fail   <span class="t-fail">regressed</span>
+  Vague ticket asks for details         fail  → pass   <span class="t-pass">fixed</span>
+
+  A baseline: 1/4 (25%)
+  B structured: 3/4 (75%)  <span class="t-pass">+50 pts</span>
+<span class="t-prompt">$</span> echo $?
+1</code></pre>
+          </figure>
         </div>
       </section>
 
-      <section class="section" aria-labelledby="example-heading">
-        <div class="container grid-2">
-          <div>
-            <p class="eyebrow">Example</p>
-            <h2 id="example-heading">A test case is a few lines of JSON.</h2>
-            <p class="section-intro">
-              This case checks that a ticket summary cites the ticket ID, never promises a refund, and assigns a P2 or P3
-              priority. The same file runs in the web app and the CLI.
-            </p>
-          </div>
-          <pre><code>{
-  "id": "refund-request",
-  "name": "Billing issue without refund promise",
-  "vars": {
-    "ticket_id": "T-1002",
-    "ticket": "I was charged twice for my March invoice."
-  },
-  "assertions": [
-    { "type": "contains", "value": "T-1002" },
-    { "type": "not-contains", "value": "we will refund" },
-    { "type": "regex", "pattern": "\\bP[23]\\b" }
-  ]
-}</code></pre>
-        </div>
-      </section>
-
-      <section class="section" id="quick-start" aria-labelledby="quickstart-heading">
-        <div class="container grid-2">
-          <div>
+      <!-- ============ QUICK START ============ -->
+      <section class="section" id="quick-start" aria-labelledby="qs-title">
+        <div class="container split">
+          <div class="split-copy">
             <p class="eyebrow">Quick start</p>
-            <h2 id="quickstart-heading">Run it locally in a minute.</h2>
-            <p class="section-intro">
-              Requires Node.js 20.12 or newer. The mock provider works immediately. To make real model calls, set
-              <code>ANTHROPIC_API_KEY</code> in your environment before starting the server.
-            </p>
-            <p><a href="https://github.com/bhargavthaparbusiness/evalsprint#readme">Read the full documentation →</a></p>
+            <h2 id="qs-title">Running locally in a minute.</h2>
+            <p class="section-lead">Requires Node.js 20.12+. The mock provider works immediately; set <code>ANTHROPIC_API_KEY</code> in your server environment to make real model calls.</p>
+            <p><a class="text-link" href="https://github.com/bhargavthaparbusiness/evalsprint#readme">Read the documentation <!-- icon:arrowRight --></a></p>
           </div>
-          <div>
-            <p class="cmd-label">Web app</p>
-            <pre><code>git clone https://github.com/bhargavthaparbusiness/evalsprint.git
-cd evalsprint
-npm install
-npm run dev   # http://127.0.0.1:5050</code></pre>
-            <p class="cmd-label">CLI</p>
-            <pre><code>npm run evalsprint -- run examples/support-tickets.json
-npm run evalsprint -- compare examples/support-tickets.json \
-  --a baseline --b structured</code></pre>
+          <div class="commands">
+            <div class="cmd">
+              <span class="cmd-label">Web app</span>
+              <pre><code><span class="t-prompt">$</span> git clone https://github.com/bhargavthaparbusiness/evalsprint.git
+<span class="t-prompt">$</span> cd evalsprint &amp;&amp; npm install
+<span class="t-prompt">$</span> npm run dev</code></pre>
+            </div>
+            <div class="cmd">
+              <span class="cmd-label">CLI</span>
+              <pre><code><span class="t-prompt">$</span> npm run evalsprint -- init my-suite.json
+<span class="t-prompt">$</span> npm run evalsprint -- run my-suite.json</code></pre>
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="section cta-band" aria-labelledby="cta-heading">
-        <div class="container">
-          <h2 id="cta-heading">Try it with the sample suite.</h2>
-          <p class="section-intro">The demo loads a support-ticket summarizer suite with two prompt versions. Run it, compare the versions, and edit the cases.</p>
+      <!-- ============ FINAL CTA ============ -->
+      <section class="cta" aria-labelledby="cta-title">
+        <div class="hero-grid" aria-hidden="true"></div>
+        <div class="container cta-inner">
+          <h2 id="cta-title">See a regression get caught.</h2>
+          <p>The app opens with a sample suite and two prompt versions. Run it, compare them, then make it yours.</p>
           <div class="hero-actions">
-            <a class="btn btn-primary" href="/app">Open the demo</a>
-            <a class="btn" href="https://github.com/bhargavthaparbusiness/evalsprint">Star on GitHub</a>
+            <a class="btn btn-primary btn-lg" href="/app">Open the app <!-- icon:arrowRight --></a>
+            <a class="btn btn-lg" href="https://github.com/bhargavthaparbusiness/evalsprint"><!-- icon:github --> View on GitHub</a>
           </div>
         </div>
       </section>

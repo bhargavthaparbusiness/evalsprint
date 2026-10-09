@@ -7,7 +7,9 @@ import { CompareView } from "./components/CompareView";
 import { JsonEditor } from "./components/JsonEditor";
 import { PromptsEditor } from "./components/PromptsEditor";
 import { RunView } from "./components/RunView";
+import { Icon } from "./components/Icon";
 import { Notice } from "./components/ui";
+import type { IconName } from "./design/icons";
 import { cloneSample, loadWorkspace, saveWorkspace, type Workspace } from "./storage";
 
 export interface RunTarget {
@@ -18,12 +20,12 @@ export interface RunTarget {
 }
 
 type Tab = "run" | "compare" | "prompts" | "cases" | "json";
-const TABS: { id: Tab; label: string }[] = [
-  { id: "run", label: "Run" },
-  { id: "compare", label: "Compare" },
-  { id: "prompts", label: "Prompts" },
-  { id: "cases", label: "Test cases" },
-  { id: "json", label: "JSON" },
+const TABS: { id: Tab; label: string; short?: string; icon: IconName }[] = [
+  { id: "run", label: "Run", icon: "play" },
+  { id: "compare", label: "Compare", icon: "compare" },
+  { id: "prompts", label: "Prompts", icon: "prompt" },
+  { id: "cases", label: "Test cases", short: "Cases", icon: "cases" },
+  { id: "json", label: "JSON", icon: "braces" },
 ];
 
 const INTRO_KEY = "evalsprint:v1:intro-dismissed";
@@ -171,138 +173,198 @@ export function App() {
     }
   }
 
+  const suiteActions = (
+    <>
+      <button className="btn btn-sm btn-ghost" onClick={() => addSuite(blankSuite(workspace.suites))}>
+        <Icon name="plus" />
+        New suite
+      </button>
+      <button className="btn btn-sm btn-ghost" onClick={() => fileInput.current?.click()}>
+        <Icon name="upload" />
+        Import JSON
+      </button>
+      <button className="btn btn-sm btn-ghost" onClick={exportSuite}>
+        <Icon name="download" />
+        Export JSON
+      </button>
+      <button className="btn btn-sm btn-ghost" onClick={() => addSuite(cloneSample())}>
+        <Icon name="flask" />
+        Add sample suite
+      </button>
+      <button
+        className="btn btn-sm btn-ghost btn-danger"
+        onClick={deleteSuite}
+        disabled={workspace.suites.length <= 1}
+        title={workspace.suites.length <= 1 ? "Keep at least one suite" : undefined}
+      >
+        <Icon name="trash" />
+        Delete suite
+      </button>
+    </>
+  );
+
   return (
     <div className="app">
-      <header className="topbar">
+      <header className="app-bar">
         <a className="brand" href="/" aria-label="EvalSprint home">
-          <img className="logo" src="/favicon.svg" alt="" width="28" height="28" />
-          <div>
-            <div className="brand-name">EvalSprint</div>
-            <div className="brand-tag">Test and compare LLM prompts against repeatable cases</div>
-          </div>
+          <img className="logo" src="/favicon.svg" alt="" width="24" height="24" />
+          <span className="brand-name">EvalSprint</span>
         </a>
-        <div className="provider-picker">
-          <div className="segmented" role="radiogroup" aria-label="Provider">
-            {(["mock", "anthropic"] as const).map((id) => {
-              const info = providers?.find((p) => p.id === id);
-              return (
-                <button
-                  key={id}
-                  role="radio"
-                  aria-checked={provider === id}
-                  className={provider === id ? "active" : ""}
-                  onClick={() => setProvider(id)}
-                  title={info?.note}
-                >
-                  {id === "mock" ? "Mock" : "Anthropic"}
-                  {id === "anthropic" && providers && !info?.available ? <span className="dot dot-off" /> : null}
-                  {id === "anthropic" && info?.available ? <span className="dot dot-on" /> : null}
-                </button>
-              );
-            })}
-          </div>
-          {provider === "anthropic" ? (
-            <input
-              className="model-input mono"
-              aria-label="Anthropic model"
-              placeholder={defaultModel || "model id"}
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
-            />
-          ) : null}
+        <span className="app-bar-divider hide-sm" aria-hidden="true" />
+        <span className="app-bar-crumb hide-sm">
+          <Icon name="folder" />
+          <span className="truncate">{suite.name || "Untitled suite"}</span>
+        </span>
+        <div className="app-bar-spacer" />
+        <div className="provider-switch" role="radiogroup" aria-label="Provider">
+          {(["mock", "anthropic"] as const).map((id) => {
+            const info = providers?.find((p) => p.id === id);
+            const unavailable = id === "anthropic" && providers !== null && !info?.available;
+            return (
+              <button
+                key={id}
+                role="radio"
+                aria-checked={provider === id}
+                className={provider === id ? "is-active" : ""}
+                onClick={() => setProvider(id)}
+                title={info?.note}
+              >
+                <Icon name={id === "mock" ? "flask" : "plug"} />
+                {id === "mock" ? "Mock" : "Anthropic"}
+                {id === "anthropic" && providers ? (
+                  <span className={`status-dot ${unavailable ? "is-off" : "is-on"}`} aria-hidden="true" />
+                ) : null}
+              </button>
+            );
+          })}
         </div>
+        <a
+          className="btn btn-ghost btn-icon hide-xs"
+          href="https://github.com/bhargavthaparbusiness/evalsprint"
+          aria-label="EvalSprint on GitHub"
+          title="GitHub"
+        >
+          <Icon name="github" />
+        </a>
       </header>
 
-      <div className="layout">
+      <div className="app-body">
         <aside className="sidebar" aria-label="Suites">
-          <div className="sidebar-head">
-            <span className="sidebar-title">Suites</span>
+          <div className="sidebar-title">
+            <span>Suites</span>
+            <span className="count">{workspace.suites.length}</span>
           </div>
           <ul className="suite-list">
             {workspace.suites.map((s, i) => (
               <li key={i}>
                 <button
-                  className={i === workspace.activeIndex ? "suite-item active" : "suite-item"}
+                  className={i === workspace.activeIndex ? "suite-item is-active" : "suite-item"}
                   onClick={() => setWorkspace((ws) => ({ ...ws, activeIndex: i }))}
                   aria-current={i === workspace.activeIndex}
                 >
-                  <span className="suite-name">{s.name || "Untitled suite"}</span>
-                  <span className="suite-meta">
-                    {s.prompts.length} prompt{s.prompts.length === 1 ? "" : "s"} · {s.cases.length} case
-                    {s.cases.length === 1 ? "" : "s"}
+                  <Icon name="folder" />
+                  <span className="suite-text">
+                    <span className="suite-name">{s.name || "Untitled suite"}</span>
+                    <span className="suite-meta">
+                      {s.prompts.length} prompt{s.prompts.length === 1 ? "" : "s"} · {s.cases.length} case
+                      {s.cases.length === 1 ? "" : "s"}
+                    </span>
                   </span>
                 </button>
               </li>
             ))}
           </ul>
-          <div className="sidebar-actions">
-            <button className="btn btn-sm" onClick={() => addSuite(blankSuite(workspace.suites))}>
-              New suite
-            </button>
-            <button className="btn btn-sm" onClick={() => fileInput.current?.click()}>
-              Import JSON
-            </button>
-            <button className="btn btn-sm" onClick={exportSuite}>
-              Export JSON
-            </button>
-            <button className="btn btn-sm" onClick={() => addSuite(cloneSample())}>
-              Add sample suite
-            </button>
-            <button
-              className="btn btn-sm btn-danger"
-              onClick={deleteSuite}
-              disabled={workspace.suites.length <= 1}
-              title={workspace.suites.length <= 1 ? "Keep at least one suite" : undefined}
-            >
-              Delete suite
-            </button>
-            <input
-              ref={fileInput}
-              type="file"
-              accept="application/json,.json"
-              hidden
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                e.target.value = "";
-                if (file) void importSuite(file);
-              }}
-            />
-          </div>
+          <div className="sidebar-actions">{suiteActions}</div>
           <p className="sidebar-note">
-            Suites are saved in this browser's local storage only — not on the server and not synced. Export JSON to
-            keep a copy or to run it with the CLI.
+            <Icon name="lock" />
+            <span>Saved in this browser only — not on the server, not synced. Export JSON to keep a copy or use the CLI.</span>
           </p>
+          <input
+            ref={fileInput}
+            type="file"
+            accept="application/json,.json"
+            hidden
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              e.target.value = "";
+              if (file) void importSuite(file);
+            }}
+          />
         </aside>
 
-        <main className="main">
-          {showIntro ? (
-            <div className="intro">
-              <div>
-                <h1 className="intro-title">Catch prompt regressions before you ship</h1>
-                <ol className="intro-steps">
-                  <li>
-                    <strong>Define test cases</strong> — input variables plus assertions (contains, does not contain,
-                    equals, regex, max length).
-                  </li>
-                  <li>
-                    <strong>Run a prompt version</strong> — every case is rendered, sent to the provider, and checked.
-                  </li>
-                  <li>
-                    <strong>Compare versions</strong> — see which cases a prompt change fixes or breaks.
-                  </li>
-                </ol>
-                <p className="muted small">
-                  The <strong>Mock</strong> provider returns fixture outputs stored in the suite, so the sample suite
-                  runs instantly with no API key and no model involved. Switch to <strong>Anthropic</strong> for real
-                  model calls once <code>ANTHROPIC_API_KEY</code> is set on the server.
+        <main className="main" id="main">
+          <div className="mobile-suite-bar">
+            <label className="mobile-suite-select">
+              <span className="sr-only">Suite</span>
+              <Icon name="folder" />
+              <select
+                value={workspace.activeIndex}
+                onChange={(e) => setWorkspace((ws) => ({ ...ws, activeIndex: Number(e.target.value) }))}
+              >
+                {workspace.suites.map((s, i) => (
+                  <option key={i} value={i}>
+                    {s.name || "Untitled suite"}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <details className="menu">
+              <summary className="btn btn-icon" aria-label="Suite actions">
+                <Icon name="menu" />
+              </summary>
+              <div
+                className="menu-panel"
+                onClick={(e) => {
+                  if ((e.target as HTMLElement).closest("button")) e.currentTarget.closest("details")?.removeAttribute("open");
+                }}
+              >
+                {suiteActions}
+                <p className="menu-note">
+                  <Icon name="lock" /> Saved in this browser only.
                 </p>
               </div>
-              <button className="btn btn-ghost btn-sm" onClick={dismissIntro} aria-label="Dismiss introduction">
-                Dismiss
+            </details>
+          </div>
+
+          {showIntro ? (
+            <div className="intro">
+              <div className="intro-body">
+                <p className="intro-title">Catch prompt regressions before they ship.</p>
+                <ol className="intro-steps">
+                  <li>
+                    <span className="step-num mono">1</span>
+                    <span>
+                      <strong>Define cases</strong> with variables and assertions.
+                    </span>
+                  </li>
+                  <li>
+                    <span className="step-num mono">2</span>
+                    <span>
+                      <strong>Run a prompt version</strong> and see why each case passed or failed.
+                    </span>
+                  </li>
+                  <li>
+                    <span className="step-num mono">3</span>
+                    <span>
+                      <strong>Compare versions</strong> to find what a change fixed or broke.
+                    </span>
+                  </li>
+                </ol>
+                <p className="intro-note">
+                  <Icon name="flask" />
+                  <span>
+                    The <strong>Mock</strong> provider returns fixture outputs stored in the suite — no API key and no
+                    model involved.
+                  </span>
+                </p>
+              </div>
+              <button className="btn btn-ghost btn-icon btn-sm intro-close" onClick={dismissIntro} aria-label="Dismiss introduction">
+                <Icon name="x" />
               </button>
             </div>
           ) : null}
 
+          <h1 className="sr-only">EvalSprint — {suite.name || "Untitled suite"}</h1>
           <div className="suite-header">
             <input
               className="suite-title-input"
@@ -310,14 +372,35 @@ export function App() {
               value={suite.name}
               onChange={(e) => updateSuite({ ...suite, name: e.target.value })}
             />
-            <input
+            <textarea
               className="suite-desc-input"
               aria-label="Suite description"
               placeholder="Add a description…"
+              rows={1}
               value={suite.description ?? ""}
               onChange={(e) => updateSuite({ ...suite, description: e.target.value || undefined })}
             />
           </div>
+
+          {provider === "anthropic" ? (
+            <div className="provider-panel">
+              <Icon name="plug" />
+              <div className="provider-panel-text">
+                <strong>Anthropic</strong>
+                <span>{anthropic?.note ?? "Checking provider availability…"}</span>
+              </div>
+              <label className="inline-field model-field">
+                <span>Model</span>
+                <input
+                  className="mono"
+                  aria-label="Anthropic model"
+                  placeholder={defaultModel || "model id"}
+                  value={model}
+                  onChange={(e) => setModel(e.target.value)}
+                />
+              </label>
+            </div>
+          ) : null}
 
           {providersError ? (
             <Notice tone="error" title="Server unavailable">
@@ -342,7 +425,7 @@ export function App() {
             <Notice tone="warn" title="Suite has validation issues">
               <ul>
                 {validation.errors.map((e) => (
-                  <li key={e} className="mono small">
+                  <li key={e} className="mono">
                     {e}
                   </li>
                 ))}
@@ -355,11 +438,22 @@ export function App() {
               <button
                 key={t.id}
                 role="tab"
+                aria-label={t.label}
                 aria-selected={tab === t.id}
-                className={tab === t.id ? "tab active" : "tab"}
+                className={tab === t.id ? "tab is-active" : "tab"}
                 onClick={() => setTab(t.id)}
               >
-                {t.label}
+                <Icon name={t.icon} />
+                {t.short ? (
+                  <>
+                    <span className="hide-xs">{t.label}</span>
+                    <span className="show-xs" aria-hidden="true">
+                      {t.short}
+                    </span>
+                  </>
+                ) : (
+                  t.label
+                )}
               </button>
             ))}
           </nav>
@@ -393,8 +487,9 @@ export function App() {
           ) : null}
         </main>
       </div>
+
       <footer className="app-footer">
-        <span>EvalSprint · MIT licensed · Public demo runs the mock provider only</span>
+        <span>EvalSprint · MIT · The public demo runs the mock provider only</span>
         <nav aria-label="Footer">
           <a href="/">Home</a>
           <a href="https://github.com/bhargavthaparbusiness/evalsprint#readme">Docs</a>

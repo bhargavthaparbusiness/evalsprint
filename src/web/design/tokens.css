@@ -1,0 +1,338 @@
+/*
+ * EvalSprint design system — shared by the static site and the app.
+ * Identity: warm "paper" canvas, near-black "ink", and colour reserved for the
+ * product's own semantics (pass / fail / error). Fonts are self-hosted (CSP-safe).
+ */
+@import "@fontsource-variable/inter/wght.css";
+@import "@fontsource-variable/jetbrains-mono/wght.css";
+
+:root {
+  /* Type */
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --text-2xs: 11px;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 15px;
+  --text-lg: 17px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 32px;
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-normal: 1.55;
+  --tracking-tight: -0.02em;
+  --tracking-tighter: -0.035em;
+  --tracking-caps: 0.08em;
+
+  /* Space (4px grid) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-12: 48px;
+  --s-16: 64px;
+  --s-20: 80px;
+  --s-24: 96px;
+
+  /* Shape */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --control-h: 36px;
+  --control-h-sm: 30px;
+  --tap: 44px;
+
+  /* Colour — light */
+  --canvas: #f6f5f1;
+  --surface: #ffffff;
+  --surface-2: #faf9f6;
+  --sunken: #efeee9;
+  --hover: #f2f1ec;
+  --line: #e5e3dc;
+  --line-strong: #d2cfc6;
+  --ink: #121316;
+  --ink-2: #474a52;
+  --ink-3: #75787f;
+  --ink-4: #a3a5aa;
+  --primary: #121316;
+  --primary-hover: #2a2c31;
+  --primary-fg: #fbfaf7;
+  --accent: #3355ff;
+  --accent-soft: #e9edff;
+  --pass: #0f7a3b;
+  --pass-strong: #12a150;
+  --pass-bg: #e6f4eb;
+  --pass-line: #bfe2cc;
+  --fail: #c62a30;
+  --fail-strong: #e5484d;
+  --fail-bg: #fcebea;
+  --fail-line: #f2c4c3;
+  --warn: #9a5b00;
+  --warn-strong: #e39b1b;
+  --warn-bg: #fcf2df;
+  --warn-line: #efd8aa;
+  --code-bg: #f3f2ee;
+
+  --shadow-xs: 0 1px 0 rgb(18 19 22 / 4%);
+  --shadow-sm: 0 1px 2px rgb(18 19 22 / 6%), 0 1px 1px rgb(18 19 22 / 3%);
+  --shadow-md: 0 1px 2px rgb(18 19 22 / 5%), 0 10px 28px -10px rgb(18 19 22 / 16%);
+  --shadow-lg: 0 2px 4px rgb(18 19 22 / 4%), 0 28px 64px -28px rgb(18 19 22 / 30%);
+  --ring: 0 0 0 2px var(--canvas), 0 0 0 4px var(--accent);
+
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --dur: 140ms;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --canvas: #0c0d0f;
+    --surface: #141518;
+    --surface-2: #17181c;
+    --sunken: #101113;
+    --hover: #1c1e22;
+    --line: #25272c;
+    --line-strong: #353840;
+    --ink: #ededee;
+    --ink-2: #b6b8be;
+    --ink-3: #888b93;
+    --ink-4: #5d6068;
+    --primary: #ededee;
+    --primary-hover: #ffffff;
+    --primary-fg: #0c0d0f;
+    --accent: #7c93ff;
+    --accent-soft: #1a2147;
+    --pass: #4cd286;
+    --pass-strong: #3cc879;
+    --pass-bg: #0f251a;
+    --pass-line: #1d4a31;
+    --fail: #ff7a76;
+    --fail-strong: #ff5f5a;
+    --fail-bg: #2c1415;
+    --fail-line: #572426;
+    --warn: #f3bb55;
+    --warn-strong: #f0a92e;
+    --warn-bg: #2a2110;
+    --warn-line: #574318;
+    --code-bg: #101113;
+    --shadow-xs: 0 1px 0 rgb(0 0 0 / 30%);
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
+    --shadow-md: 0 1px 2px rgb(0 0 0 / 40%), 0 12px 32px -12px rgb(0 0 0 / 60%);
+    --shadow-lg: 0 2px 4px rgb(0 0 0 / 40%), 0 32px 72px -24px rgb(0 0 0 / 70%);
+    color-scheme: dark;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01", "ss03";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+code,
+kbd,
+pre,
+.mono {
+  font-family: var(--font-mono);
+  font-feature-settings: "calt" 0;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Icons */
+.icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.icon-fill {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* Buttons */
+.btn {
+  --btn-h: var(--control-h);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  height: var(--btn-h);
+  padding: 0 14px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font: 550 var(--text-base) / 1 var(--font-sans);
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: var(--shadow-xs);
+  transition:
+    background var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:hover:not(:disabled) {
+  background: var(--hover);
+}
+.btn:active:not(:disabled) {
+  transform: translateY(0.5px);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-fg);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--ink-2);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--hover);
+  color: var(--ink);
+}
+.btn-danger {
+  color: var(--fail);
+}
+.btn-sm {
+  --btn-h: var(--control-h-sm);
+  padding: 0 10px;
+  font-size: var(--text-sm);
+  gap: 6px;
+}
+.btn-lg {
+  --btn-h: 44px;
+  padding: 0 20px;
+  font-size: var(--text-md);
+  border-radius: var(--r-md);
+}
+.btn-icon {
+  width: var(--btn-h);
+  padding: 0;
+}
+
+/* Form controls */
+.app :where(input:not([type="checkbox"]):not([type="file"])),
+.app :where(select, textarea) {
+  width: 100%;
+  min-width: 0;
+  height: var(--control-h);
+  padding: 0 10px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font: 400 var(--text-base) / 1.4 var(--font-sans);
+  box-shadow: var(--shadow-xs);
+  transition:
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+.app :where(textarea) {
+  height: auto;
+  padding: 8px 10px;
+  line-height: var(--leading-normal);
+  resize: vertical;
+}
+.app :where(select) {
+  appearance: none;
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2375787f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+  cursor: pointer;
+}
+.app :where(input:not([type="checkbox"]):not([type="file"])):hover,
+.app :where(select, textarea):hover {
+  border-color: var(--ink-4);
+}
+.app :where(input:not([type="checkbox"]):not([type="file"])):focus-visible,
+.app :where(select, textarea):focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.app :where(input[type="checkbox"]) {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* iOS: avoid zoom on focus for small text inputs */
+@media (max-width: 640px) {
+  .app :where(input:not([type="checkbox"]):not([type="file"])),
+  .app :where(select, textarea) {
+    font-size: 16px;
+  }
+}

@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createApiHandler } from "./api.js";
 import { loadDotEnv } from "./env.js";
-import { createStaticHandler } from "./static.js";
+import { createStaticHandler, resolveStaticFile } from "./static.js";
 
 const thisFile = fileURLToPath(import.meta.url);
 // Both src/server/index.ts (dev, via tsx) and dist/server/index.js (built) sit two levels below the root.
@@ -46,12 +46,18 @@ if (isBuilt) {
   const vite = await createViteServer({
     configFile: path.join(projectRoot, "vite.config.ts"),
     server: { middlewareMode: true, hmr: { server } },
-    appType: "spa",
+    appType: "mpa",
   });
-  fallback = (req, res) =>
+  const webRoot = path.join(projectRoot, "src", "web");
+  fallback = async (req, res) => {
+    // Clean URLs in dev, matching production: /privacy → /privacy.html.
+    const url = new URL(req.url ?? "/", "http://localhost");
+    const page = await resolveStaticFile(webRoot, url.pathname);
+    if (page?.endsWith(".html")) req.url = `/${path.relative(webRoot, page)}${url.search}`;
     vite.middlewares(req, res, () => {
-      res.writeHead(404).end("Not found");
+      res.writeHead(404, { "Content-Type": "text/plain" }).end("Not found");
     });
+  };
 }
 
 server.listen(port, host, () => {

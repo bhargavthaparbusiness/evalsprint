@@ -105,6 +105,37 @@ h4 {
 }
 
 /* Layout */
+.app-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 20px;
+  flex-wrap: wrap;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.app-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+.app-footer a {
+  color: var(--text-2);
+  text-decoration: none;
+}
+.app-footer a:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+.app-footer a:focus-visible,
+.brand:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
 .app {
   min-height: 100vh;
 }
@@ -128,15 +159,14 @@ h4 {
   align-items: center;
   gap: 10px;
 }
+.brand {
+  color: inherit;
+  text-decoration: none;
+}
 .logo {
-  display: inline-grid;
-  place-items: center;
+  display: block;
   width: 28px;
   height: 28px;
-  border-radius: 6px;
-  background: var(--text);
-  color: var(--bg);
-  font-weight: 700;
 }
 .brand-name {
   font-weight: 650;

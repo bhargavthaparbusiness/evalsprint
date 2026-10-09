@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy Policy — EvalSprint</title>
+    <meta name="description" content="How the EvalSprint public demo handles your data: suites stay in browser storage, evaluation requests are processed in memory, and no analytics or cookies are used." />
+    <meta name="theme-color" content="#16181d" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href="https://evalsprint.vercel.app/privacy" />
+    <link rel="stylesheet" href="/site/site.css" />
+  </head>
+  <body>
+    <!-- @header -->
+    <main id="main" class="page">
+      <article class="container narrow prose">
+        <h1>Privacy Policy</h1>
+        <p class="updated">Last updated: 9 October 2026</p>
+
+        <p>
+          This policy describes how the public EvalSprint demo at <strong>evalsprint.vercel.app</strong> handles data. It
+          is based on what the application's source code actually does, which you can inspect in the
+          <a href="https://github.com/bhargavthaparbusiness/evalsprint">public repository</a>. EvalSprint is an
+          open-source project maintained by the GitHub user
+          <a href="https://github.com/bhargavthaparbusiness">bhargavthaparbusiness</a> (“the maintainer”, “we”).
+        </p>
+
+        <div class="callout">
+          <p><strong>In short:</strong> your suites are saved in your own browser. When you press Run or Compare, the suite is sent to the demo's server, evaluated in memory, and returned. The app keeps no copy, sets no cookies, and includes no analytics or tracking. The public demo never calls an AI provider.</p>
+        </div>
+
+        <h2>1. Data stored in your browser</h2>
+        <p>The web app stores the following in your browser's <code>localStorage</code> for this site only:</p>
+        <ul>
+          <li><code>evalsprint:v1:workspace</code>: your evaluation suites (names, descriptions, prompt templates, test cases, assertions and mock fixtures) and which suite is selected.</li>
+          <li><code>evalsprint:v1:intro-dismissed</code>: whether you dismissed the introduction panel.</li>
+        </ul>
+        <p>
+          This data stays on your device. It is not synced between browsers or devices and is not sent anywhere unless
+          you run an evaluation (see below). Evaluation results are kept in the page's memory only and disappear when you
+          reload or close it.
+        </p>
+
+        <h2>2. Data sent to the server</h2>
+        <p>The app talks only to its own server (same origin). It makes these requests:</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th scope="col">When</th><th scope="col">Request</th><th scope="col">What is sent</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Opening the demo</td><td><code>GET /api/providers</code></td><td>Nothing beyond the request itself.</td></tr>
+              <tr><td>Pressing <em>Run evaluations</em></td><td><code>POST /api/run</code></td><td>The full current suite (name, description, prompts, test cases with their variables, assertions and mock fixtures, settings), the selected prompt version and the selected provider.</td></tr>
+              <tr><td>Pressing <em>Run comparison</em></td><td><code>POST /api/compare</code></td><td>The same suite data plus the two selected prompt versions.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          The server validates the suite, runs the evaluation in memory, and returns the results to your browser. The
+          application does not write suites or results to a database, file or log. If an unexpected internal error
+          occurs, the server logs the error itself, not your request body.
+        </p>
+        <p>
+          <strong>Please don't put personal data, secrets or confidential information in suites you run on the public
+          demo.</strong> Use a self-hosted instance for anything sensitive.
+        </p>
+
+        <h2>3. AI providers</h2>
+        <p>
+          <strong>On the public demo, the Anthropic provider is disabled.</strong> This is enforced in the server code
+          regardless of configuration, and only the mock provider runs. Mock outputs come from fixtures in your suite; no
+          AI model is involved and no data is sent to any AI provider.
+        </p>
+        <p>
+          On a <strong>self-hosted instance</strong> where the operator has set <code>ANTHROPIC_API_KEY</code>, choosing
+          the Anthropic provider sends each rendered prompt (system prompt and user message built from your test case
+          variables) to Anthropic's API. Anthropic's own terms and privacy policy then apply, and the operator of that
+          instance is responsible for it.
+        </p>
+
+        <h2>4. Hosting and logs</h2>
+        <p>
+          The demo is hosted on <a href="https://vercel.com">Vercel</a>, which runs the server functions in the United
+          States (region <code>iad1</code>). Like any web host, Vercel receives standard request information such as
+          your IP address, user agent, the requested path and timestamps, and keeps platform logs under its own
+          policies. See the <a href="https://vercel.com/legal/privacy-policy">Vercel Privacy Policy</a>. The maintainer
+          can view these platform logs for operating and debugging the demo.
+        </p>
+
+        <h2>5. Cookies, analytics and third parties</h2>
+        <ul>
+          <li><strong>Cookies:</strong> EvalSprint does not set any cookies.</li>
+          <li><strong>Analytics and tracking:</strong> none. The site includes no analytics, advertising or tracking scripts.</li>
+          <li><strong>Third-party resources:</strong> the site loads no external scripts, fonts or images. Its Content Security Policy only allows resources from its own origin.</li>
+          <li><strong>Links:</strong> links to GitHub and Vercel take you to sites with their own privacy policies.</li>
+        </ul>
+
+        <h2>6. Retention and deletion</h2>
+        <ul>
+          <li><strong>Browser data</strong> stays until you delete it. Use <em>Delete suite</em> in the app, or clear this site's data in your browser settings to remove everything.</li>
+          <li><strong>Evaluation requests</strong> are not retained by the application after the response is sent.</li>
+          <li><strong>Hosting logs</strong> are retained by Vercel according to its policies. The maintainer does not export or keep separate copies.</li>
+        </ul>
+
+        <h2>7. Public demo versus self-hosted instances</h2>
+        <p>
+          This policy covers only the public demo operated by the maintainer at evalsprint.vercel.app. EvalSprint is
+          open-source software, and anyone can run their own copy. A self-hosted instance may be configured differently,
+          for example with real AI providers enabled. Its operator, not the maintainer, is responsible for how it handles
+          data.
+        </p>
+
+        <h2>8. Changes</h2>
+        <p>
+          If the app's data handling changes, this page will be updated along with the date above. Its full history is in the
+          <a href="https://github.com/bhargavthaparbusiness/evalsprint/commits/main/src/web/privacy.html">repository</a>.
+        </p>
+
+        <h2>9. Contact</h2>
+        <p>
+          For privacy questions, see the <a href="/contact">Contact page</a>. Issues on GitHub are public, so please don't
+          include personal or sensitive details in them.
+        </p>
+      </article>
+    </main>
+    <!-- @footer -->
+  </body>
+</html>

@@ -5,6 +5,7 @@ import type { Suite } from "../core/types.js";
  * Suites live in this browser's localStorage only. There is no server-side
  * storage, sync or sharing — use Export/Import (JSON) to move suites around.
  */
+// Key predates the PitchvioEvals rename; kept so suites saved in browsers are not lost.
 const KEY = "evalsprint:v1:workspace";
 
 export interface Workspace {

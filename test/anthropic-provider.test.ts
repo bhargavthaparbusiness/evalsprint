@@ -107,8 +107,13 @@ describe("describeProviders", () => {
       available: false,
       defaultModel: DEFAULT_ANTHROPIC_MODEL,
     });
-    const withKey = describeProviders({ ANTHROPIC_API_KEY: "sk-secret-value", EVALSPRINT_ANTHROPIC_MODEL: "m2" });
+    const withKey = describeProviders({ ANTHROPIC_API_KEY: "sk-secret-value", PITCHVIOEVALS_ANTHROPIC_MODEL: "m2" });
     expect(withKey.find((p) => p.id === "anthropic")).toMatchObject({ available: true, defaultModel: "m2" });
     expect(JSON.stringify(withKey)).not.toContain("sk-secret-value");
+    // The pre-rebrand variable still works, and the new name wins when both are set.
+    const legacy = describeProviders({ ANTHROPIC_API_KEY: "k", EVALSPRINT_ANTHROPIC_MODEL: "old" });
+    expect(legacy.find((p) => p.id === "anthropic")).toMatchObject({ defaultModel: "old" });
+    const both = describeProviders({ ANTHROPIC_API_KEY: "k", EVALSPRINT_ANTHROPIC_MODEL: "old", PITCHVIOEVALS_ANTHROPIC_MODEL: "new" });
+    expect(both.find((p) => p.id === "anthropic")).toMatchObject({ defaultModel: "new" });
   });
 });

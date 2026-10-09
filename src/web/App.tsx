@@ -28,6 +28,7 @@ const TABS: { id: Tab; label: string; short?: string; icon: IconName }[] = [
   { id: "json", label: "JSON", icon: "braces" },
 ];
 
+// Pre-rename storage key, kept for compatibility (see storage.ts).
 const INTRO_KEY = "evalsprint:v1:intro-dismissed";
 
 function blankSuite(existing: Suite[]): Suite {
@@ -206,9 +207,9 @@ export function App() {
   return (
     <div className="app">
       <header className="app-bar">
-        <a className="brand" href="/" aria-label="EvalSprint home">
+        <a className="brand" href="/" aria-label="PitchvioEvals home">
           <img className="logo" src="/favicon.svg" alt="" width="24" height="24" />
-          <span className="brand-name">EvalSprint</span>
+          <span className="brand-name">PitchvioEvals</span>
         </a>
         <span className="app-bar-divider hide-sm" aria-hidden="true" />
         <span className="app-bar-crumb hide-sm">
@@ -241,7 +242,7 @@ export function App() {
         <a
           className="btn btn-ghost btn-icon hide-xs"
           href="https://github.com/bhargavthaparbusiness/evalsprint"
-          aria-label="EvalSprint on GitHub"
+          aria-label="PitchvioEvals on GitHub"
           title="GitHub"
         >
           <Icon name="github" />
@@ -364,7 +365,7 @@ export function App() {
             </div>
           ) : null}
 
-          <h1 className="sr-only">EvalSprint — {suite.name || "Untitled suite"}</h1>
+          <h1 className="sr-only">PitchvioEvals — {suite.name || "Untitled suite"}</h1>
           <div className="suite-header">
             <input
               className="suite-title-input"
@@ -489,7 +490,7 @@ export function App() {
       </div>
 
       <footer className="app-footer">
-        <span>EvalSprint · MIT · The public demo runs the mock provider only</span>
+        <span>PitchvioEvals · MIT · The public demo runs the mock provider only</span>
         <nav aria-label="Footer">
           <a href="/">Home</a>
           <a href="https://github.com/bhargavthaparbusiness/evalsprint#readme">Docs</a>

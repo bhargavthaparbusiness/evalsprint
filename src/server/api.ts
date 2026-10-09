@@ -87,7 +87,7 @@ async function readJson(req: IncomingMessage, maxBytes: number): Promise<unknown
 
 /**
  * Rejects cross-site requests: a page on another origin must not be able to
- * trigger (paid) model calls through a locally running EvalSprint server.
+ * trigger (paid) model calls through a locally running PitchvioEvals server.
  */
 function assertSameOrigin(req: IncomingMessage): void {
   const origin = req.headers.origin;
@@ -199,7 +199,7 @@ export function createApiHandler(options: ApiOptions = {}) {
       } else if (error instanceof EvalConfigError || error instanceof ProviderError) {
         sendJson(res, 400, { error: error.message });
       } else {
-        console.error("[evalsprint] unexpected API error:", error);
+        console.error("[pitchvioevals] unexpected API error:", error);
         sendJson(res, 500, { error: "Internal server error. See the server log for details." });
       }
       return true;

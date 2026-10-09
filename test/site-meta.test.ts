@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { injectConstants, pageMeta, robotsTxt, sitemapXml } from "../src/web/site/layout.js";
 
-const page = (head: string) => `<html><head><title>About — EvalSprint</title><meta name="description" content="A &quot;test&quot; page" />${head}</head></html>`;
+const page = (head: string) => `<html><head><title>About — PitchvioEvals</title><meta name="description" content="A &quot;test&quot; page" />${head}</head></html>`;
 
 describe("site metadata", () => {
   it("adds canonical and social tags on the canonical domain", () => {
     const meta = pageMeta("/about", page(""));
     expect(meta).toContain('<link rel="canonical" href="https://pitchvio.info/about" />');
     expect(meta).toContain('<meta property="og:url" content="https://pitchvio.info/about" />');
-    expect(meta).toContain('<meta property="og:site_name" content="EvalSprint" />');
-    expect(meta).toContain('<meta property="og:title" content="About — EvalSprint" />');
+    expect(meta).toContain('<meta property="og:site_name" content="PitchvioEvals" />');
+    expect(meta).toContain('<meta property="og:title" content="About — PitchvioEvals" />');
     expect(meta).toContain('<meta name="twitter:card" content="summary_large_image" />');
   });
 

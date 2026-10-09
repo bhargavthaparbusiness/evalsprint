@@ -148,6 +148,8 @@ vite.config.ts.timestamp-*
 # Turbo Repo
 .turbo
 
-# EvalSprint
-# Suite files created by `evalsprint init` in the repo root (examples/ is tracked)
+# PitchvioEvals
+# Suite files created by `pitchvioevals init` in the repo root (examples/ is tracked)
+/pitchvioevals.suite.json
+# Default file name used before the rename from EvalSprint
 /evalsprint.suite.json

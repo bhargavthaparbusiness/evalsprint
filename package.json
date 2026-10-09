@@ -1,5 +1,5 @@
 {
-  "name": "evalsprint",
+  "name": "pitchvioevals",
   "version": "0.1.0",
   "description": "Regression testing and evaluation toolkit for LLM prompts: test suites, deterministic assertions, prompt comparison, mock and Anthropic providers.",
   "license": "MIT",
@@ -17,6 +17,7 @@
     "node": ">=20.12"
   },
   "bin": {
+    "pitchvioevals": "dist/cli/index.js",
     "evalsprint": "dist/cli/index.js"
   },
   "files": [
@@ -29,7 +30,8 @@
     "build:node": "tsc -p tsconfig.node.json",
     "build:web": "vite build",
     "start": "node dist/server/index.js",
-    "evalsprint": "tsx src/cli/index.ts",
+    "pitchvioevals": "tsx src/cli/index.ts",
+    "evalsprint": "npm run pitchvioevals --",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.web.json",

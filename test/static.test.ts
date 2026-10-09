@@ -11,7 +11,7 @@ let server: Server;
 let base: string;
 
 beforeAll(async () => {
-  root = await mkdtemp(path.join(tmpdir(), "evalsprint-static-"));
+  root = await mkdtemp(path.join(tmpdir(), "pitchvioevals-static-"));
   await mkdir(path.join(root, "assets"));
   await writeFile(path.join(root, "index.html"), "home");
   await writeFile(path.join(root, "app.html"), "app");

@@ -3,7 +3,9 @@ import type { CompletionRequest, CompletionResponse, Provider } from "./types.js
 import { ProviderError } from "./types.js";
 
 export const ANTHROPIC_API_KEY_ENV = "ANTHROPIC_API_KEY";
-export const ANTHROPIC_MODEL_ENV = "EVALSPRINT_ANTHROPIC_MODEL";
+export const ANTHROPIC_MODEL_ENV = "PITCHVIOEVALS_ANTHROPIC_MODEL";
+/** Pre-rebrand name, still honoured so existing .env files keep working. */
+export const LEGACY_ANTHROPIC_MODEL_ENV = "EVALSPRINT_ANTHROPIC_MODEL";
 export const DEFAULT_ANTHROPIC_MODEL = "claude-opus-5-5";
 export const DEFAULT_MAX_TOKENS = 16000;
 
@@ -29,7 +31,7 @@ export function hasAnthropicKey(env: NodeJS.ProcessEnv = process.env): boolean {
 }
 
 export function resolveDefaultAnthropicModel(env: NodeJS.ProcessEnv = process.env): string {
-  return env[ANTHROPIC_MODEL_ENV]?.trim() || DEFAULT_ANTHROPIC_MODEL;
+  return env[ANTHROPIC_MODEL_ENV]?.trim() || env[LEGACY_ANTHROPIC_MODEL_ENV]?.trim() || DEFAULT_ANTHROPIC_MODEL;
 }
 
 export class AnthropicProvider implements Provider {
@@ -47,7 +49,7 @@ export class AnthropicProvider implements Provider {
     if (!apiKey) {
       throw new ProviderError(
         `${ANTHROPIC_API_KEY_ENV} is not set. Add it to your environment or a local .env file ` +
-          "(see .env.example), then start EvalSprint again. The mock provider works without a key.",
+          "(see .env.example), then start PitchvioEvals again. The mock provider works without a key.",
       );
     }
     this.client = new Anthropic({ apiKey, maxRetries: 2, timeout: 120_000 });

@@ -16,14 +16,14 @@ export interface CliIO {
   color: boolean;
 }
 
-export const HELP = `EvalSprint — evaluate LLM prompts against repeatable test cases.
+export const HELP = `PitchvioEvals — evaluate LLM prompts against repeatable test cases.
 
 Usage:
-  evalsprint init [file] [--force]          Write a sample suite (default: evalsprint.suite.json)
-  evalsprint validate <file>                Check a suite file for errors
-  evalsprint run <file> [options]           Run one prompt version against every test case
-  evalsprint compare <file> --a <id> --b <id> [options]
-                                            Run two prompt versions and compare per case
+  pitchvioevals init [file] [--force]          Write a sample suite (default: pitchvioevals.suite.json)
+  pitchvioevals validate <file>                Check a suite file for errors
+  pitchvioevals run <file> [options]           Run one prompt version against every test case
+  pitchvioevals compare <file> --a <id> --b <id> [options]
+                                               Run two prompt versions and compare per case
 
 Options:
   --prompt <id>        Prompt version to run (default: first in the suite)
@@ -37,7 +37,7 @@ Exit codes: 0 all tests passed · 1 a test failed or errored · 2 usage or confi
 
 class UsageError extends Error {}
 
-const DEFAULT_SUITE_FILE = "evalsprint.suite.json";
+const DEFAULT_SUITE_FILE = "pitchvioevals.suite.json";
 
 async function loadSuite(file: string, cwd: string): Promise<Suite> {
   const fullPath = path.resolve(cwd, file);
@@ -103,11 +103,11 @@ export async function runCli(argv: string[], io: CliIO): Promise<number> {
         }
         await writeFile(target, `${JSON.stringify(sampleSuite, null, 2)}\n`, "utf8");
         const rel = path.relative(io.cwd, target) || target;
-        io.stdout(`Created ${rel}\n\nTry it (no API key needed):\n  evalsprint run ${rel}\n  evalsprint compare ${rel} --a baseline --b structured`);
+        io.stdout(`Created ${rel}\n\nTry it (no API key needed):\n  pitchvioevals run ${rel}\n  pitchvioevals compare ${rel} --a baseline --b structured`);
         return 0;
       }
       case "validate": {
-        if (!file) throw new UsageError("Usage: evalsprint validate <file>");
+        if (!file) throw new UsageError("Usage: pitchvioevals validate <file>");
         const suite = await loadSuite(file, io.cwd);
         io.stdout(
           `${c.green("Valid")}: "${suite.name}" — ${suite.prompts.length} prompt version(s), ${suite.cases.length} test case(s)`,
@@ -115,7 +115,7 @@ export async function runCli(argv: string[], io: CliIO): Promise<number> {
         return 0;
       }
       case "run": {
-        if (!file) throw new UsageError("Usage: evalsprint run <file> [--prompt <id>] [--provider mock|anthropic]");
+        if (!file) throw new UsageError("Usage: pitchvioevals run <file> [--prompt <id>] [--provider mock|anthropic]");
         const suite = await loadSuite(file, io.cwd);
         const provider = createProvider(parseProvider(values.provider));
         const run = await runSuite(suite, {
@@ -128,7 +128,7 @@ export async function runCli(argv: string[], io: CliIO): Promise<number> {
       }
       case "compare": {
         if (!file || !values.a || !values.b) {
-          throw new UsageError("Usage: evalsprint compare <file> --a <prompt-id> --b <prompt-id>");
+          throw new UsageError("Usage: pitchvioevals compare <file> --a <prompt-id> --b <prompt-id>");
         }
         const suite = await loadSuite(file, io.cwd);
         const provider = createProvider(parseProvider(values.provider));

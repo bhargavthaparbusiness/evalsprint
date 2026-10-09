@@ -8,11 +8,11 @@ import { iconSvg } from "../design/icons.js";
 
 /**
  * Canonical public origin. Used for canonical links, Open Graph/Twitter tags,
- * sitemap.xml and robots.txt. The Vercel URL (evalsprint.vercel.app) remains a
+ * sitemap.xml and robots.txt. The legacy Vercel URL (evalsprint.vercel.app) remains a
  * working fallback; its pages point search engines here via rel=canonical.
  */
 export const SITE_URL = "https://pitchvio.info";
-export const SITE_NAME = "EvalSprint";
+export const SITE_NAME = "PitchvioEvals";
 /** Public product/business contact address (receiving only; see /privacy). */
 export const CONTACT_EMAIL = "contact@pitchvio.info";
 export const REPO_URL = "https://github.com/bhargavthaparbusiness/evalsprint";
@@ -37,10 +37,10 @@ export function siteHeader(page: string): string {
   return `<a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="container header-inner">
-    <a class="brand" href="/" aria-label="EvalSprint home">${LOGO}<span>EvalSprint</span></a>
+    <a class="brand" href="/" aria-label="PitchvioEvals home">${LOGO}<span>PitchvioEvals</span></a>
     <nav class="site-nav" aria-label="Main">${links}</nav>
     <div class="header-actions">
-      <a class="btn btn-ghost btn-icon header-gh" href="${REPO_URL}" aria-label="EvalSprint on GitHub">${iconSvg("github")}</a>
+      <a class="btn btn-ghost btn-icon header-gh" href="${REPO_URL}" aria-label="PitchvioEvals on GitHub">${iconSvg("github")}</a>
       <a class="btn btn-primary btn-sm header-cta" href="/app">Open app</a>
       <details class="mobile-nav">
         <summary class="btn btn-icon" aria-label="Menu">${iconSvg("menu", "icon icon-open")}${iconSvg("x", "icon icon-close")}</summary>
@@ -63,7 +63,7 @@ export function siteFooter(page: string): string {
   return `<footer class="site-footer">
   <div class="container footer-grid">
     <div class="footer-about">
-      <a class="brand" href="/">${LOGO}<span>EvalSprint</span></a>
+      <a class="brand" href="/">${LOGO}<span>PitchvioEvals</span></a>
       <p>Regression tests for LLM prompts. Open source under the MIT License.</p>
     </div>
     ${col("Product", [["/app", "Open the app"], [DOCS_URL, "Documentation"], [REPO_URL, "GitHub"]])}
@@ -71,7 +71,7 @@ export function siteFooter(page: string): string {
     ${col("Legal", [["/privacy", "Privacy Policy"], ["/terms", "Terms of Service"]])}
   </div>
   <div class="container footer-base">
-    <span>EvalSprint is an open-source project. The public demo runs the mock provider only.</span>
+    <span>PitchvioEvals is an open-source project. The public demo runs the mock provider only.</span>
   </div>
 </footer>`;
 }
@@ -115,7 +115,7 @@ export function pageMeta(route: string, html: string): string {
   }
   if (!has('property="og:image"')) {
     tags.push(`<meta property="og:image" content="${image}" />`);
-    tags.push(`<meta property="og:image:alt" content="EvalSprint comparing two prompt versions on the same test cases" />`);
+    tags.push(`<meta property="og:image:alt" content="PitchvioEvals comparing two prompt versions on the same test cases" />`);
   }
   if (!has('name="twitter:card"')) tags.push(`<meta name="twitter:card" content="summary_large_image" />`);
   return tags.map((t) => `    ${t}`).join("\n");

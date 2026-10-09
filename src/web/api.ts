@@ -14,7 +14,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   try {
     res = await fetch(path, init);
   } catch {
-    throw new ApiError("Could not reach the EvalSprint server. Is `npm run dev` (or `npm start`) still running?");
+    throw new ApiError("Could not reach the PitchvioEvals server. Is `npm run dev` (or `npm start`) still running?");
   }
   let body: unknown;
   try {

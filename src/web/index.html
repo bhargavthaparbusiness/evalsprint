@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>EvalSprint — Regression tests for LLM prompts</title>
-    <meta name="description" content="EvalSprint is an open-source tool for evaluating and comparing LLM prompts against repeatable test cases with deterministic assertions, a mock provider, a CLI, and optional Anthropic integration." />
+    <title>PitchvioEvals — Regression tests for LLM prompts</title>
+    <meta name="description" content="PitchvioEvals is an open-source tool for evaluating and comparing LLM prompts against repeatable test cases with deterministic assertions, a mock provider, a CLI, and optional Anthropic integration." />
     <meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0c0d0f" media="(prefers-color-scheme: dark)" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta property="og:title" content="EvalSprint — Know exactly what your prompt change broke" />
+    <meta property="og:title" content="PitchvioEvals — Know exactly what your prompt change broke" />
     <meta property="og:description" content="Run every prompt version against the same test cases, check each response with deterministic assertions, and see which cases were fixed or regressed." />
     <link rel="stylesheet" href="/site/site.css" />
   </head>
@@ -26,7 +26,7 @@
           </a>
           <h1 id="hero-title" class="hero-title">Know exactly what your <br class="br-md" />prompt change broke.</h1>
           <p class="hero-lead">
-            EvalSprint runs every prompt version against the same test cases, checks each response with deterministic
+            PitchvioEvals runs every prompt version against the same test cases, checks each response with deterministic
             assertions, and shows which cases got fixed — and which quietly regressed.
           </p>
           <div class="hero-actions">
@@ -218,7 +218,7 @@
             <p class="section-lead">Both versions run against identical cases and assertions. You get the pass-rate delta, a per-case transition, and both outputs side by side.</p>
           </div>
           <figure class="shot">
-            <img src="/screenshots/compare.jpg" width="1440" height="900" loading="lazy" alt="EvalSprint's Compare view: version A at 25%, version B at 75%, plus 50 points, three cases fixed and one regressed, with the regressed case expanded to show both outputs." />
+            <img src="/screenshots/compare.jpg" width="1440" height="900" loading="lazy" alt="PitchvioEvals's Compare view: version A at 25%, version B at 75%, plus 50 points, three cases fixed and one regressed, with the regressed case expanded to show both outputs." />
           </figure>
           <div class="callouts">
             <div class="callout-item"><!-- icon:fix --><div><h3>Pass-rate delta</h3><p>A single number for the change, backed by the cases that moved it.</p></div></div>
@@ -281,7 +281,7 @@
           </div>
           <figure class="terminal" aria-label="Real output of the compare command on the sample suite">
             <div class="terminal-bar"><!-- icon:terminal --> <span>Terminal</span></div>
-<pre class="terminal-body"><code><span class="t-prompt">$</span> npm run evalsprint -- compare \
+<pre class="terminal-body"><code><span class="t-prompt">$</span> npm run pitchvioevals -- compare \
     examples/support-tickets.json --a baseline --b structured
 
 <span class="t-strong">Compare: v1 — baseline  vs  v2 — structured</span>
@@ -317,8 +317,8 @@
             </div>
             <div class="cmd">
               <span class="cmd-label">CLI</span>
-              <pre><code><span class="t-prompt">$</span> npm run evalsprint -- init my-suite.json
-<span class="t-prompt">$</span> npm run evalsprint -- run my-suite.json</code></pre>
+              <pre><code><span class="t-prompt">$</span> npm run pitchvioevals -- init my-suite.json
+<span class="t-prompt">$</span> npm run pitchvioevals -- run my-suite.json</code></pre>
             </div>
           </div>
         </div>

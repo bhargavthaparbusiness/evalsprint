@@ -37,7 +37,7 @@ export function JsonEditor({ suite, onChange }: { suite: Suite; onChange: (suite
         <div className="toolbar-title">
           <h2 id="json-heading">Suite JSON</h2>
           <p>
-            The exact file format the CLI reads (<code>evalsprint run suite.json</code>). Changes are validated before
+            The exact file format the CLI reads (<code>pitchvioevals run suite.json</code>). Changes are validated before
             they apply.
           </p>
         </div>

@@ -11,7 +11,7 @@ let err: string[];
 const io = () => ({ stdout: (t: string) => out.push(t), stderr: (t: string) => err.push(t), cwd: dir, color: false });
 
 beforeEach(async () => {
-  dir = await mkdtemp(path.join(tmpdir(), "evalsprint-cli-"));
+  dir = await mkdtemp(path.join(tmpdir(), "pitchvioevals-cli-"));
   out = [];
   err = [];
 });
@@ -20,18 +20,18 @@ afterEach(() => rm(dir, { recursive: true, force: true }));
 describe("CLI", () => {
   it("init writes a valid sample suite and refuses to overwrite without --force", async () => {
     expect(await runCli(["init"], io())).toBe(0);
-    const suite = JSON.parse(await readFile(path.join(dir, "evalsprint.suite.json"), "utf8")) as { name: string };
+    const suite = JSON.parse(await readFile(path.join(dir, "pitchvioevals.suite.json"), "utf8")) as { name: string };
     expect(suite.name).toBe("Support ticket summarizer");
     expect(await runCli(["init"], io())).toBe(2);
     expect(err.join()).toContain("already exists");
     expect(await runCli(["init", "--force"], io())).toBe(0);
-    expect(await runCli(["validate", "evalsprint.suite.json"], io())).toBe(0);
+    expect(await runCli(["validate", "pitchvioevals.suite.json"], io())).toBe(0);
   });
 
   it("run prints a report and exits 1 when a test fails", async () => {
     await runCli(["init"], io());
     out = [];
-    expect(await runCli(["run", "evalsprint.suite.json"], io())).toBe(1);
+    expect(await runCli(["run", "pitchvioevals.suite.json"], io())).toBe(1);
     const report = out.join("\n");
     expect(report).toContain("FAIL  Login outage is P1");
     expect(report).toContain('✗ does not contain "we will refund"');
@@ -53,7 +53,7 @@ describe("CLI", () => {
   it("compare reports fixes and regressions", async () => {
     await runCli(["init"], io());
     out = [];
-    await runCli(["compare", "evalsprint.suite.json", "--a", "baseline", "--b", "structured", "--json"], io());
+    await runCli(["compare", "pitchvioevals.suite.json", "--a", "baseline", "--b", "structured", "--json"], io());
     const cmp = JSON.parse(out.join("")) as ComparisonResult;
     expect(cmp.passRateDelta).toBeCloseTo(0.5);
   });
@@ -66,7 +66,7 @@ describe("CLI", () => {
     expect(await runCli(["run", "bad.json", "--provider", "openai"], io())).toBe(2);
     expect(await runCli(["frobnicate"], io())).toBe(2);
     await runCli(["init"], io());
-    expect(await runCli(["run", "evalsprint.suite.json", "--prompt", "nope"], io())).toBe(2);
+    expect(await runCli(["run", "pitchvioevals.suite.json", "--prompt", "nope"], io())).toBe(2);
     expect(err.join()).toContain('Unknown prompt version "nope"');
   });
 });

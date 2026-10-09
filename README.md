@@ -1,14 +1,16 @@
-# EvalSprint
+# PitchvioEvals
 
 Open-source regression testing for LLM prompts. Write test cases once, run any prompt version against them, and see exactly which cases pass, which fail, and why — before you ship a prompt change.
 
-EvalSprint is for developers who iterate on prompts and want something more repeatable than eyeballing outputs in a playground, without adopting a hosted evaluation platform. It runs locally: a small Node server, a web UI, and a CLI that all share one evaluation engine.
+PitchvioEvals is for developers who iterate on prompts and want something more repeatable than eyeballing outputs in a playground, without adopting a hosted evaluation platform. It runs locally: a small Node server, a web UI, and a CLI that all share one evaluation engine.
 
 - **Website:** <https://pitchvio.info>
 - **Live demo app:** <https://pitchvio.info/app> (mock provider only — see [Deploy a preview to Vercel](#deploy-a-preview-to-vercel))
-- **Fallback deployment URL:** <https://evalsprint.vercel.app> (same deployment)
+- **Legacy deployment URL:** <https://evalsprint.vercel.app> (same deployment; pages point search engines to pitchvio.info)
 - **Source:** <https://github.com/bhargavthaparbusiness/evalsprint>
 - **Contact:** [contact@pitchvio.info](mailto:contact@pitchvio.info)
+
+> PitchvioEvals was previously called **EvalSprint**. The GitHub repository and the legacy Vercel address still use the old name; the `evalsprint` CLI command, the `EVALSPRINT_ANTHROPIC_MODEL` variable and suites saved in the browser keep working.
 
 > **Status:** early MVP (v0.1). The feature set below is what exists today. See [Limitations](#limitations) and [Roadmap](#roadmap).
 
@@ -55,8 +57,8 @@ The sample suite has two prompt versions and four test cases. Its mock fixtures 
 From the CLI:
 
 ```bash
-npm run evalsprint -- run examples/support-tickets.json
-npm run evalsprint -- compare examples/support-tickets.json --a baseline --b structured
+npm run pitchvioevals -- run examples/support-tickets.json
+npm run pitchvioevals -- compare examples/support-tickets.json --a baseline --b structured
 ```
 
 Real output of the comparison:
@@ -122,8 +124,8 @@ A suite file (the same format the UI exports and the CLI reads):
 Run it with the mock provider, then against a real model:
 
 ```bash
-npm run evalsprint -- run suite.json --prompt structured
-npm run evalsprint -- run suite.json --prompt structured --provider anthropic
+npm run pitchvioevals -- run suite.json --prompt structured
+npm run pitchvioevals -- run suite.json --prompt structured --provider anthropic
 ```
 
 ### Suite reference
@@ -159,7 +161,7 @@ Details:
 
 - The key is read only from the server/CLI process environment. It is never sent to the browser; `/api/providers` reports only whether a key is set.
 - Real calls happen only when Anthropic is explicitly selected. The UI shows how many API calls a run will make before you press Run.
-- Default model: `claude-opus-5-5`. Override per run (UI model field / `--model`), per suite (`settings.model`), or globally with `EVALSPRINT_ANTHROPIC_MODEL`.
+- Default model: `claude-opus-5-5`. Override per run (UI model field / `--model`), per suite (`settings.model`), or globally with `PITCHVIOEVALS_ANTHROPIC_MODEL` (the pre-rename `EVALSPRINT_ANTHROPIC_MODEL` is still read as a fallback).
 - Each case is one non-streaming Messages API request (up to 4 concurrently, SDK default retries). Latency, token usage (`input_tokens` / `output_tokens`), the served model and the stop reason are recorded as returned by the API.
 - A `refusal` stop reason is reported as an error for that case. Server-side model fallbacks are intentionally **not** enabled, so results always come from the model you selected.
 - Authentication, permission, 404 (unknown model), rate-limit, server and network errors are mapped to short, actionable messages.
@@ -169,10 +171,10 @@ Details:
 ## CLI
 
 ```
-evalsprint init [file] [--force]          Write a sample suite (default: evalsprint.suite.json)
-evalsprint validate <file>                Check a suite file for errors
-evalsprint run <file> [options]           Run one prompt version against every test case
-evalsprint compare <file> --a <id> --b <id> [options]
+pitchvioevals init [file] [--force]          Write a sample suite (default: pitchvioevals.suite.json)
+pitchvioevals validate <file>                Check a suite file for errors
+pitchvioevals run <file> [options]           Run one prompt version against every test case
+pitchvioevals compare <file> --a <id> --b <id> [options]
 
 Options:
   --prompt <id>        Prompt version to run (default: first in the suite)
@@ -183,7 +185,7 @@ Options:
 
 Exit codes: `0` all tests passed, `1` at least one test failed or errored, `2` usage/configuration error. For `compare`, the exit code reflects version B.
 
-Inside this repo use `npm run evalsprint -- <args>`. After `npm run build`, `node dist/cli/index.js <args>` works too, and `npm link` exposes an `evalsprint` command. (The package is not published to npm.)
+Inside this repo use `npm run pitchvioevals -- <args>`. After `npm run build`, `node dist/cli/index.js <args>` works too, and `npm link` exposes a `pitchvioevals` command (the old `evalsprint` command name is kept as an alias, as is `npm run evalsprint`). (The package is not published to npm.)
 
 ## Deploy a preview to Vercel
 
@@ -194,7 +196,7 @@ The repo includes a small Vercel adapter (`vercel.json` and `api/*.js`). It serv
 
 A hosted deployment is public and has no login, so the adapter runs in **demo mode**:
 
-- **Mock provider only.** Anthropic is disabled even if `ANTHROPIC_API_KEY` is set, so nobody can spend API credits through the URL. To use real models, run EvalSprint locally.
+- **Mock provider only.** Anthropic is disabled even if `ANTHROPIC_API_KEY` is set, so nobody can spend API credits through the URL. To use real models, run PitchvioEvals locally.
 - **Request limits:** 200 KB request bodies, 50 test cases per suite, and a 10-second function timeout.
 - **Regex limits:** every regex assertion has a time limit (250 ms each, 1 s total per run), so a pathological pattern can't hang the server. Patterns are capped at 500 characters everywhere.
 - **Security headers:** a strict Content-Security-Policy, `X-Frame-Options: DENY`, `nosniff`, and `Referrer-Policy: no-referrer`.
@@ -206,7 +208,7 @@ There is no rate limiting. If a deployment attracts abuse, add a rate-limit rule
 | Variable | Default | Purpose |
 | -------- | ------- | ------- |
 | `ANTHROPIC_API_KEY` | — | Enables the Anthropic provider |
-| `EVALSPRINT_ANTHROPIC_MODEL` | `claude-opus-5-5` | Default Anthropic model |
+| `PITCHVIOEVALS_ANTHROPIC_MODEL` | `claude-opus-5-5` | Default Anthropic model (legacy name `EVALSPRINT_ANTHROPIC_MODEL` also accepted) |
 | `HOST` | `127.0.0.1` | Server bind address |
 | `PORT` | `5050` | Server port |
 
@@ -276,7 +278,7 @@ Ideas, not commitments:
 - Saved run history and diffing outputs between runs.
 - Repeat runs per case to measure flakiness at non-zero sampling variance.
 - More providers behind the same interface.
-- A GitHub Action wrapper around `evalsprint run`.
+- A GitHub Action wrapper around `pitchvioevals run`.
 
 ## Contributing
 
@@ -295,7 +297,7 @@ Please don't commit `.env` files or API keys.
 - Bugs and feature requests: [GitHub Issues](https://github.com/bhargavthaparbusiness/evalsprint/issues)
 - Security issues: email the address above privately rather than opening a public issue.
 
-EvalSprint is maintained by one person, so replies may take a few days.
+PitchvioEvals is maintained by one person, so replies may take a few days.
 
 ## License
 

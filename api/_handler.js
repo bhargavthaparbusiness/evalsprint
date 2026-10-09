@@ -13,7 +13,7 @@ const handleApi = createApiHandler({
   regexTimeoutMs: 250,
   regexBudgetMs: 1000,
   anthropicDisabledReason:
-    "Disabled on this public demo deployment (no authentication). Run EvalSprint locally with ANTHROPIC_API_KEY to use real models.",
+    "Disabled on this public demo deployment (no authentication). Run PitchvioEvals locally with ANTHROPIC_API_KEY to use real models.",
 });
 
 export default async function handler(req, res) {

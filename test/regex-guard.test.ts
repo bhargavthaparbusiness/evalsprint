@@ -24,10 +24,10 @@ describe("guarded regex matcher", () => {
   });
 
   it("enforces a total time budget across calls", () => {
-    const match = createGuardedRegexMatcher(40, 60);
-    expect(() => match(EVIL, undefined, EVIL_INPUT)).toThrow(/exceeded/);
-    expect(() => match(EVIL, undefined, EVIL_INPUT)).toThrow(RegexTimeoutError);
-    expect(() => match("a", undefined, "a")).toThrow(/budget of 60 ms for this run is exhausted/);
+    // The per-call limit is capped by the remaining budget, so one slow call spends all of it.
+    const match = createGuardedRegexMatcher(100, 30);
+    expect(() => match(EVIL, undefined, EVIL_INPUT)).toThrow(/exceeded 30 ms/);
+    expect(() => match("a", undefined, "a")).toThrow(/budget of 30 ms for this run is exhausted/);
   });
 
   it("reports a timeout as a failed assertion instead of throwing", () => {

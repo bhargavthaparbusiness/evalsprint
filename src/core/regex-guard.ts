@@ -20,8 +20,9 @@ export function createGuardedRegexMatcher(timeoutMs: number, totalBudgetMs = Num
   const context = vm.createContext({ p: "", f: undefined as string | undefined, s: "" });
   let spentMs = 0;
   return (pattern, flags, text) => {
-    const remaining = totalBudgetMs - spentMs;
-    if (remaining <= 0) {
+    // vm timeouts are whole milliseconds, so a sub-millisecond remainder counts as exhausted.
+    const remaining = Math.floor(totalBudgetMs - spentMs);
+    if (remaining < 1) {
       throw new RegexTimeoutError(`regex time budget of ${totalBudgetMs} ms for this run is exhausted`);
     }
     const limit = Math.max(1, Math.floor(Math.min(timeoutMs, remaining)));

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Terms of Service — EvalSprint</title>
+    <meta name="description" content="Terms for using the EvalSprint public demo: permitted use, your responsibility for test data, availability, limits of evaluation results, and disclaimers." />
+    <meta name="theme-color" content="#16181d" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href="https://evalsprint.vercel.app/terms" />
+    <link rel="stylesheet" href="/site/site.css" />
+  </head>
+  <body>
+    <!-- @header -->
+    <main id="main" class="page">
+      <article class="container narrow prose">
+        <h1>Terms of Service</h1>
+        <p class="updated">Last updated: 9 October 2026</p>
+
+        <p>
+          These terms apply to the public EvalSprint demo at <strong>evalsprint.vercel.app</strong> (“the demo”), operated
+          by the maintainer of the EvalSprint open-source project. By using the demo you agree to them. If you don't agree,
+          please don't use the demo.
+        </p>
+
+        <div class="callout">
+          <p>
+            <strong>The software and the demo are different things.</strong> The EvalSprint source code is licensed under
+            the <a href="https://github.com/bhargavthaparbusiness/evalsprint/blob/main/LICENSE">MIT License</a>, which
+            governs copying, modifying and running it yourself. These terms cover only the hosted demo.
+          </p>
+        </div>
+
+        <h2>1. What the demo is</h2>
+        <p>
+          The demo is a free, early-stage (v0.1) preview for trying EvalSprint. It runs only the mock provider, which
+          returns fixture outputs from your suite. It does not call any AI model.
+        </p>
+
+        <h2>2. Permitted use</h2>
+        <p>You may use the demo to explore EvalSprint and to evaluate your own test suites. You agree not to:</p>
+        <ul>
+          <li>use it for anything unlawful, or to process content you have no right to use;</li>
+          <li>try to disrupt, overload or circumvent the demo's limits, for example through automated high-volume requests or deliberately expensive inputs;</li>
+          <li>attempt to access systems or data that aren't intended for you;</li>
+          <li>misrepresent demo results as outputs of a real AI model.</li>
+        </ul>
+        <p>
+          If you find a security issue, please report it responsibly (see <a href="/contact">Contact</a>) rather than
+          exploiting it.
+        </p>
+
+        <h2>3. Your prompts and test data</h2>
+        <p>
+          You're responsible for the prompts, test cases and other content you enter, and for having the right to use
+          them. Don't enter personal data, secrets or confidential information on the public demo. Suites are stored in
+          your browser, and the maintainer does not claim any ownership of them. See the
+          <a href="/privacy">Privacy Policy</a> for how data is handled.
+        </p>
+
+        <h2>4. Availability</h2>
+        <p>
+          The demo is provided free of charge and on a best-effort basis. It may be slow, unavailable, rate-limited,
+          changed or discontinued at any time without notice. Suites saved in your browser may be lost if browser data is
+          cleared or the storage format changes, so export anything you want to keep.
+        </p>
+
+        <h2>5. Limits of evaluation results</h2>
+        <ul>
+          <li>EvalSprint's assertions are deterministic string checks. A passing suite means the outputs met <em>those specific checks</em>. It doesn't mean a prompt is correct, safe, unbiased or fit for any purpose.</li>
+          <li>Mock results reflect the fixtures you wrote, not the behaviour of any model.</li>
+          <li>Real model outputs (on self-hosted instances) can vary between runs and model versions. One passing run is no guarantee of future behaviour.</li>
+        </ul>
+        <p>You remain responsible for decisions you make based on evaluation results.</p>
+
+        <h2>6. Third-party AI providers</h2>
+        <p>
+          The public demo doesn't use any third-party AI provider. If you run your own instance with the optional
+          Anthropic integration, your use of Anthropic's API is governed by your agreement with Anthropic, and you are
+          responsible for your API key, usage and costs.
+        </p>
+
+        <h2>7. Disclaimer</h2>
+        <p>
+          The demo is provided “as is” and “as available”, without warranties of any kind, express or implied, including
+          merchantability, fitness for a particular purpose and non-infringement. To the extent permitted by law, the
+          maintainer is not liable for any damages arising from your use of the demo or its results. This mirrors the
+          disclaimer in the MIT License that covers the software itself.
+        </p>
+
+        <h2>8. Changes to these terms</h2>
+        <p>
+          These terms may be updated as the project evolves. The date above will change, and the history is public in the
+          <a href="https://github.com/bhargavthaparbusiness/evalsprint/commits/main/src/web/terms.html">repository</a>.
+          Continuing to use the demo after a change means you accept the updated terms.
+        </p>
+
+        <h2>9. Contact</h2>
+        <p>Questions about these terms: see the <a href="/contact">Contact page</a>.</p>
+      </article>
+    </main>
+    <!-- @footer -->
+  </body>
+</html>

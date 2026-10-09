@@ -10,22 +10,35 @@ const CONTENT_TYPES: Record<string, string> = {
   ".json": "application/json; charset=utf-8",
   ".svg": "image/svg+xml",
   ".png": "image/png",
+  ".jpg": "image/jpeg",
   ".ico": "image/x-icon",
   ".woff2": "font/woff2",
 };
 
-/** Serves the built web UI from `root`, falling back to index.html for client routes. */
-export function createStaticHandler(root: string) {
+/**
+ * Resolves a URL path to a page or asset in `root`, mirroring the Vercel config
+ * (`cleanUrls`): `/` → index.html, `/privacy` → privacy.html, `/assets/x.js` → file.
+ * Returns undefined for anything outside `root` or not found.
+ */
+export async function resolveStaticFile(root: string, pathname: string): Promise<string | undefined> {
   const resolvedRoot = path.resolve(root);
-
-  async function fileIfExists(candidate: string): Promise<string | undefined> {
+  const clean = pathname.replace(/\/+$/, "") || "/";
+  const candidates = clean === "/" ? ["index.html"] : [`.${clean}`, `.${clean}.html`];
+  for (const candidate of candidates) {
+    const full = path.resolve(resolvedRoot, candidate);
+    if (full !== resolvedRoot && !full.startsWith(resolvedRoot + path.sep)) return undefined;
     try {
-      const info = await stat(candidate);
-      return info.isFile() ? candidate : undefined;
+      if ((await stat(full)).isFile()) return full;
     } catch {
-      return undefined;
+      // try the next candidate
     }
   }
+  return undefined;
+}
+
+/** Serves the built site from `root`, with clean URLs and 404.html for unknown paths. */
+export function createStaticHandler(root: string) {
+  const resolvedRoot = path.resolve(root);
 
   return async function serveStatic(req: IncomingMessage, res: ServerResponse): Promise<void> {
     if (req.method !== "GET" && req.method !== "HEAD") {
@@ -39,16 +52,18 @@ export function createStaticHandler(root: string) {
       res.writeHead(400).end();
       return;
     }
-    const requested = path.resolve(resolvedRoot, `.${pathname}`);
-    const inside = requested === resolvedRoot || requested.startsWith(resolvedRoot + path.sep);
-    const file =
-      (inside ? await fileIfExists(requested) : undefined) ?? (await fileIfExists(path.join(resolvedRoot, "index.html")));
+    let status = 200;
+    let file = await resolveStaticFile(resolvedRoot, pathname);
+    if (!file) {
+      status = 404;
+      file = await resolveStaticFile(resolvedRoot, "/404");
+    }
     if (!file) {
       res.writeHead(404, { "Content-Type": "text/plain" }).end("Not found");
       return;
     }
     const ext = path.extname(file);
-    res.writeHead(200, {
+    res.writeHead(status, {
       "Content-Type": CONTENT_TYPES[ext] ?? "application/octet-stream",
       "Cache-Control": file.includes(`${path.sep}assets${path.sep}`) ? "public, max-age=31536000, immutable" : "no-cache",
       "X-Content-Type-Options": "nosniff",

@@ -3,12 +3,202 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="EvalSprint — test and compare LLM prompts against repeatable test cases." />
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%23111827'/%3E%3Cpath d='M4 8.5l2.5 2.5L12 5.5' stroke='%2334d399' stroke-width='2' fill='none'/%3E%3C/svg%3E" />
-    <title>EvalSprint</title>
+    <title>EvalSprint — Regression tests for LLM prompts</title>
+    <meta name="description" content="EvalSprint is an open-source tool for evaluating and comparing LLM prompts against repeatable test cases with deterministic assertions, a mock provider, a CLI, and optional Anthropic integration." />
+    <meta name="theme-color" content="#16181d" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href="https://evalsprint.vercel.app/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="EvalSprint — Regression tests for LLM prompts" />
+    <meta property="og:description" content="Write test cases once, run any prompt version against them, and see exactly which cases pass, fail, and why." />
+    <meta property="og:url" content="https://evalsprint.vercel.app/" />
+    <meta property="og:image" content="https://evalsprint.vercel.app/screenshots/run.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="stylesheet" href="/site/site.css" />
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="./main.tsx"></script>
+    <!-- @header -->
+    <main id="main">
+      <section class="hero">
+        <div class="container">
+          <p class="eyebrow">Open source · MIT licensed</p>
+          <h1>Catch prompt regressions before you ship them.</h1>
+          <p class="lead">
+            EvalSprint runs your LLM prompts against repeatable test cases, checks every response with deterministic
+            assertions, and shows exactly which cases a prompt change fixes or breaks.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="/app">Try the demo</a>
+            <a class="btn" href="https://github.com/bhargavthaparbusiness/evalsprint">View on GitHub</a>
+          </div>
+          <p class="hero-note">The demo runs in your browser with the mock provider: no sign-up, no API key, no model calls.</p>
+          <figure class="shot hero-shot">
+            <img src="/screenshots/run.jpg" width="1280" height="800" alt="EvalSprint dashboard after running the sample suite: 25% pass rate, with failing cases expanded to show which assertions failed and why." />
+            <figcaption>The EvalSprint dashboard running the built-in sample suite on the mock provider.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="problem-heading">
+        <div class="container grid-2">
+          <div>
+            <p class="eyebrow">The problem</p>
+            <h2 id="problem-heading">Prompt changes are code changes without tests.</h2>
+            <p class="section-intro">
+              A small wording change can fix one behaviour and quietly break another. Checking outputs by hand in a
+              playground doesn't scale, and it isn't repeatable.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Built for developers who</h3>
+            <ul class="problem-list">
+              <li>iterate on system prompts and templates for an LLM feature,</li>
+              <li>want a fast, local check before merging a prompt change,</li>
+              <li>need results that are explainable, not just a score,</li>
+              <li>would rather keep test data in a JSON file than in a hosted platform.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="how-heading">
+        <div class="container">
+          <p class="eyebrow">How it works</p>
+          <h2 id="how-heading">Three steps, one suite file.</h2>
+          <div class="grid-3">
+            <div class="card">
+              <div class="step-num" aria-hidden="true">1</div>
+              <h3>Define test cases</h3>
+              <p>Each case supplies template variables and the assertions its output must satisfy.</p>
+            </div>
+            <div class="card">
+              <div class="step-num" aria-hidden="true">2</div>
+              <h3>Run a prompt version</h3>
+              <p>Every case is rendered, sent to the provider, and checked. Each assertion explains its result.</p>
+            </div>
+            <div class="card">
+              <div class="step-num" aria-hidden="true">3</div>
+              <h3>Compare versions</h3>
+              <p>Run two prompt versions on the same cases and see pass rates and exactly which cases changed.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="features" aria-labelledby="features-heading">
+        <div class="container">
+          <p class="eyebrow">Features</p>
+          <h2 id="features-heading">What's in the box</h2>
+          <p class="section-intro">Everything below exists in the current release (v0.1). See the README for limitations and the roadmap.</p>
+          <div class="grid-3">
+            <div class="card">
+              <h3>Deterministic assertions</h3>
+              <p><code>contains</code>, <code>not-contains</code>, <code>equals</code>, <code>regex</code> and <code>max-length</code>. A case passes only if every assertion passes, and failures say why.</p>
+            </div>
+            <div class="card">
+              <h3>Mock mode</h3>
+              <p>A deterministic provider that returns fixture outputs stored in the suite. Free, repeatable, and clearly labelled as not generated by a model.</p>
+            </div>
+            <div class="card">
+              <h3>Prompt comparison</h3>
+              <p>Side-by-side pass rates, the change in points, and per-case <em>fixed</em> / <em>regressed</em> labels with both outputs.</p>
+            </div>
+            <div class="card">
+              <h3>CLI</h3>
+              <p><code>init</code>, <code>validate</code>, <code>run</code> and <code>compare</code>, with JSON output and exit codes you can use in CI.</p>
+            </div>
+            <div class="card">
+              <h3>Anthropic integration <span class="tag">optional</span></h3>
+              <p>Real model calls through the official SDK on your own instance, with the key read from the server environment only. Disabled on the public demo.</p>
+            </div>
+            <div class="card">
+              <h3>Local-first</h3>
+              <p>Suites are plain JSON. The web app keeps them in your browser, and they import and export straight into the CLI.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="preview-heading">
+        <div class="container">
+          <p class="eyebrow">Preview</p>
+          <h2 id="preview-heading">See why a prompt change helped or hurt.</h2>
+          <p class="section-intro">Screenshots of the actual app running the sample suite. The comparison shows the structured prompt fixing three cases and regressing one.</p>
+          <div class="shots-grid">
+            <figure class="shot">
+              <img src="/screenshots/compare.jpg" width="1280" height="800" loading="lazy" alt="Comparison view: version A at 25%, version B at 75%, a change of plus 50 points, with one case marked regressed and its two outputs shown side by side." />
+              <figcaption>Comparing two prompt versions on the same cases.</figcaption>
+            </figure>
+            <figure class="shot">
+              <img src="/screenshots/mobile.jpg" width="390" height="844" loading="lazy" alt="The EvalSprint dashboard on a phone-sized screen, showing run metrics and stacked result cards." />
+              <figcaption>The same app on a phone.</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="example-heading">
+        <div class="container grid-2">
+          <div>
+            <p class="eyebrow">Example</p>
+            <h2 id="example-heading">A test case is a few lines of JSON.</h2>
+            <p class="section-intro">
+              This case checks that a ticket summary cites the ticket ID, never promises a refund, and assigns a P2 or P3
+              priority. The same file runs in the web app and the CLI.
+            </p>
+          </div>
+          <pre><code>{
+  "id": "refund-request",
+  "name": "Billing issue without refund promise",
+  "vars": {
+    "ticket_id": "T-1002",
+    "ticket": "I was charged twice for my March invoice."
+  },
+  "assertions": [
+    { "type": "contains", "value": "T-1002" },
+    { "type": "not-contains", "value": "we will refund" },
+    { "type": "regex", "pattern": "\\bP[23]\\b" }
+  ]
+}</code></pre>
+        </div>
+      </section>
+
+      <section class="section" id="quick-start" aria-labelledby="quickstart-heading">
+        <div class="container grid-2">
+          <div>
+            <p class="eyebrow">Quick start</p>
+            <h2 id="quickstart-heading">Run it locally in a minute.</h2>
+            <p class="section-intro">
+              Requires Node.js 20.12 or newer. The mock provider works immediately. To make real model calls, set
+              <code>ANTHROPIC_API_KEY</code> in your environment before starting the server.
+            </p>
+            <p><a href="https://github.com/bhargavthaparbusiness/evalsprint#readme">Read the full documentation →</a></p>
+          </div>
+          <div>
+            <p class="cmd-label">Web app</p>
+            <pre><code>git clone https://github.com/bhargavthaparbusiness/evalsprint.git
+cd evalsprint
+npm install
+npm run dev   # http://127.0.0.1:5050</code></pre>
+            <p class="cmd-label">CLI</p>
+            <pre><code>npm run evalsprint -- run examples/support-tickets.json
+npm run evalsprint -- compare examples/support-tickets.json \
+  --a baseline --b structured</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="section cta-band" aria-labelledby="cta-heading">
+        <div class="container">
+          <h2 id="cta-heading">Try it with the sample suite.</h2>
+          <p class="section-intro">The demo loads a support-ticket summarizer suite with two prompt versions. Run it, compare the versions, and edit the cases.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="/app">Open the demo</a>
+            <a class="btn" href="https://github.com/bhargavthaparbusiness/evalsprint">Star on GitHub</a>
+          </div>
+        </div>
+      </section>
+    </main>
+    <!-- @footer -->
   </body>
 </html>

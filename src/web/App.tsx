@@ -174,15 +174,13 @@ export function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <div className="brand">
-          <span className="logo" aria-hidden="true">
-            ✓
-          </span>
+        <a className="brand" href="/" aria-label="EvalSprint home">
+          <img className="logo" src="/favicon.svg" alt="" width="28" height="28" />
           <div>
             <div className="brand-name">EvalSprint</div>
             <div className="brand-tag">Test and compare LLM prompts against repeatable cases</div>
           </div>
-        </div>
+        </a>
         <div className="provider-picker">
           <div className="segmented" role="radiogroup" aria-label="Provider">
             {(["mock", "anthropic"] as const).map((id) => {
@@ -395,6 +393,18 @@ export function App() {
           ) : null}
         </main>
       </div>
+      <footer className="app-footer">
+        <span>EvalSprint · MIT licensed · Public demo runs the mock provider only</span>
+        <nav aria-label="Footer">
+          <a href="/">Home</a>
+          <a href="https://github.com/bhargavthaparbusiness/evalsprint#readme">Docs</a>
+          <a href="https://github.com/bhargavthaparbusiness/evalsprint">GitHub</a>
+          <a href="/about">About</a>
+          <a href="/contact">Contact</a>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+        </nav>
+      </footer>
     </div>
   );
 }

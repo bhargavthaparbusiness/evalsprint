@@ -4,6 +4,8 @@ Open-source regression testing for LLM prompts. Write test cases once, run any p
 
 EvalSprint is for developers who iterate on prompts and want something more repeatable than eyeballing outputs in a playground, without adopting a hosted evaluation platform. It runs locally: a small Node server, a web UI, and a CLI that all share one evaluation engine.
 
+**Live demo:** <https://evalsprint.vercel.app> (landing page) · <https://evalsprint.vercel.app/app> (the app, mock provider only)
+
 > **Status:** early MVP (v0.1). The feature set below is what exists today. See [Limitations](#limitations) and [Roadmap](#roadmap).
 
 ## Features
@@ -28,13 +30,13 @@ npm install
 npm run dev
 ```
 
-Open <http://127.0.0.1:5050>. A sample suite ("Support ticket summarizer") is preloaded. Press **Run evaluations** — it runs on the mock provider with no configuration.
+Open <http://127.0.0.1:5050/app>. A sample suite ("Support ticket summarizer") is preloaded. Press **Run evaluations** — it runs on the mock provider with no configuration.
 
 Production build:
 
 ```bash
 npm run build
-npm start          # serves the built UI and API on http://127.0.0.1:5050
+npm start          # serves the site, app and API on http://127.0.0.1:5050
 ```
 
 ## The mock demo (no credentials)
@@ -223,10 +225,16 @@ src/
     sample.ts      built-in demo suite
   server/      node:http API (/api/providers, /api/run, /api/compare) + static/Vite serving
   cli/         CLI on top of core
-  web/         React UI (Vite); talks only to the server API
+  web/         Vite multi-page site
+    index.html     landing page (static HTML, no JS)
+    app.html       the React evaluation app, served at /app; talks only to the server API
+    privacy.html, terms.html, contact.html, about.html, 404.html
+    site/          shared header/footer (injected at build time) and site CSS
 test/          Vitest tests
 examples/      Sample suite file
 ```
+
+Site routes: `/` landing, `/app` app, `/privacy`, `/terms`, `/contact`, `/about`; unknown paths return the 404 page with a 404 status. Clean URLs work the same locally and on Vercel (`cleanUrls` in `vercel.json`).
 
 The web UI never evaluates anything itself: it posts the suite to the local server, which runs `core`. The CLI calls `core` directly.
 

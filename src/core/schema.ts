@@ -33,7 +33,7 @@ export const assertionSchema = z.discriminatedUnion("type", [
   }),
   z.object({
     type: z.literal("regex"),
-    pattern: nonEmpty,
+    pattern: nonEmpty.max(500, "must be at most 500 characters"),
     flags: z
       .string()
       .regex(/^[dgimsuvy]*$/, "contains an unsupported regex flag")

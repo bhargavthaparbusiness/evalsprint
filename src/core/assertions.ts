@@ -23,8 +23,22 @@ export function describeAssertion(assertion: Assertion): string {
   }
 }
 
+export interface AssertionOptions {
+  /** Custom regex executor, e.g. a time-limited one. Returns the matched text or null. */
+  matchRegex?: (pattern: string, flags: string | undefined, text: string) => string | null;
+}
+
+const defaultMatchRegex = (pattern: string, flags: string | undefined, text: string): string | null => {
+  const match = new RegExp(pattern, flags).exec(text);
+  return match === null ? null : match[0];
+};
+
 /** Evaluates one deterministic assertion against a model output. Never throws. */
-export function evaluateAssertion(assertion: Assertion, output: string): AssertionResult {
+export function evaluateAssertion(
+  assertion: Assertion,
+  output: string,
+  options: AssertionOptions = {},
+): AssertionResult {
   const label = describeAssertion(assertion);
   const result = (passed: boolean, detail: string): AssertionResult => ({
     assertion,
@@ -55,14 +69,18 @@ export function evaluateAssertion(assertion: Assertion, output: string): Asserti
       );
     }
     case "regex": {
-      let pattern: RegExp;
       try {
-        pattern = new RegExp(assertion.pattern, assertion.flags);
+        new RegExp(assertion.pattern, assertion.flags);
       } catch (error) {
         return result(false, `invalid regular expression: ${(error as Error).message}`);
       }
-      const match = pattern.exec(output);
-      return result(match !== null, match ? `matched ${JSON.stringify(preview(match[0]))}` : "no match in output");
+      let match: string | null;
+      try {
+        match = (options.matchRegex ?? defaultMatchRegex)(assertion.pattern, assertion.flags, output);
+      } catch (error) {
+        return result(false, (error as Error).message);
+      }
+      return result(match !== null, match !== null ? `matched ${JSON.stringify(preview(match))}` : "no match in output");
     }
     case "max-length": {
       const length = [...output].length;

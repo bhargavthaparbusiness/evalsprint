@@ -5,7 +5,7 @@ import { compareSuite, EvalConfigError, runSuite } from "../core/runner.js";
 import { formatIssues, providerIdSchema, suiteSchema } from "../core/schema.js";
 import type { ProviderId } from "../core/types.js";
 
-const MAX_BODY_BYTES = 1_000_000;
+const DEFAULT_MAX_BODY_BYTES = 1_000_000;
 
 const modelSchema = z.string().trim().min(1).max(200).optional();
 
@@ -26,6 +26,19 @@ const compareRequestSchema = z.object({
 
 export interface ApiOptions {
   env?: NodeJS.ProcessEnv;
+  /** Maximum request body size in bytes. Defaults to 1 MB. */
+  maxBodyBytes?: number;
+  /** Maximum test cases per suite accepted by run/compare. Defaults to the schema limit. */
+  maxCases?: number;
+  /**
+   * When set, the Anthropic provider is disabled regardless of any API key and
+   * this text is shown as the reason (used by public deployments).
+   */
+  anthropicDisabledReason?: string;
+  /** Time limit per regex assertion in milliseconds. */
+  regexTimeoutMs?: number;
+  /** Total regex time per run in milliseconds. */
+  regexBudgetMs?: number;
   /** Override provider construction (used by tests). */
   providerFactory?: (id: ProviderId) => Provider;
 }
@@ -50,7 +63,7 @@ function sendJson(res: ServerResponse, status: number, body: unknown): void {
   res.end(payload);
 }
 
-async function readJson(req: IncomingMessage): Promise<unknown> {
+async function readJson(req: IncomingMessage, maxBytes: number): Promise<unknown> {
   const contentType = req.headers["content-type"] ?? "";
   if (!contentType.toLowerCase().startsWith("application/json")) {
     throw new HttpError(415, "Content-Type must be application/json");
@@ -60,7 +73,9 @@ async function readJson(req: IncomingMessage): Promise<unknown> {
   for await (const chunk of req) {
     const buffer = chunk as Buffer;
     size += buffer.length;
-    if (size > MAX_BODY_BYTES) throw new HttpError(413, "Request body is larger than 1 MB");
+    if (size > maxBytes) {
+      throw new HttpError(413, `Request body is larger than ${Math.round(maxBytes / 1000)} KB`);
+    }
     chunks.push(buffer);
   }
   try {
@@ -107,7 +122,22 @@ function abortOnDisconnect(res: ServerResponse): AbortSignal {
  */
 export function createApiHandler(options: ApiOptions = {}) {
   const env = options.env ?? process.env;
-  const makeProvider = options.providerFactory ?? createProvider;
+  const maxBodyBytes = options.maxBodyBytes ?? DEFAULT_MAX_BODY_BYTES;
+  const baseFactory = options.providerFactory ?? createProvider;
+  const disabledReason = options.anthropicDisabledReason;
+  const makeProvider = (id: ProviderId): Provider => {
+    if (id === "anthropic" && disabledReason) throw new ProviderError(disabledReason);
+    return baseFactory(id);
+  };
+  const checkCaseLimit = (suite: { cases: unknown[] }) => {
+    if (options.maxCases !== undefined && suite.cases.length > options.maxCases) {
+      throw new HttpError(400, `This server accepts at most ${options.maxCases} test cases per suite`);
+    }
+  };
+  const providerList = () =>
+    describeProviders(env).map((p) =>
+      p.id === "anthropic" && disabledReason ? { ...p, available: false, note: disabledReason } : p,
+    );
 
   return async function handleApi(req: IncomingMessage, res: ServerResponse): Promise<boolean> {
     const url = new URL(req.url ?? "/", "http://localhost");
@@ -120,16 +150,19 @@ export function createApiHandler(options: ApiOptions = {}) {
           sendJson(res, 200, { ok: true });
           return true;
         case "GET /api/providers":
-          sendJson(res, 200, { providers: describeProviders(env) });
+          sendJson(res, 200, { providers: providerList() });
           return true;
         case "POST /api/run": {
           assertSameOrigin(req);
-          const body = parseBody(runRequestSchema, await readJson(req));
+          const body = parseBody(runRequestSchema, await readJson(req, maxBodyBytes));
+          checkCaseLimit(body.suite);
           const provider = makeProvider(body.provider);
           const result = await runSuite(body.suite, {
             provider,
             promptId: body.promptId,
             ...(body.model ? { model: body.model } : {}),
+            ...(options.regexTimeoutMs ? { regexTimeoutMs: options.regexTimeoutMs } : {}),
+            ...(options.regexBudgetMs ? { regexBudgetMs: options.regexBudgetMs } : {}),
             signal: abortOnDisconnect(res),
           });
           sendJson(res, 200, result);
@@ -137,11 +170,14 @@ export function createApiHandler(options: ApiOptions = {}) {
         }
         case "POST /api/compare": {
           assertSameOrigin(req);
-          const body = parseBody(compareRequestSchema, await readJson(req));
+          const body = parseBody(compareRequestSchema, await readJson(req, maxBodyBytes));
+          checkCaseLimit(body.suite);
           const provider = makeProvider(body.provider);
           const result = await compareSuite(body.suite, body.promptA, body.promptB, {
             provider,
             ...(body.model ? { model: body.model } : {}),
+            ...(options.regexTimeoutMs ? { regexTimeoutMs: options.regexTimeoutMs } : {}),
+            ...(options.regexBudgetMs ? { regexBudgetMs: options.regexBudgetMs } : {}),
             signal: abortOnDisconnect(res),
           });
           sendJson(res, 200, result);

@@ -184,10 +184,16 @@ Inside this repo use `npm run evalsprint -- <args>`. After `npm run build`, `nod
 The repo includes a small Vercel adapter (`vercel.json` and `api/*.js`). It serves the built UI as static files and exposes the existing API handler as serverless functions.
 
 1. In Vercel, choose **Add New → Project**, import this GitHub repository, and keep the defaults (`vercel.json` sets the build command and output directory).
-2. Deploy. The mock provider works immediately, with no environment variables.
-3. **Do not set `ANTHROPIC_API_KEY` on a public deployment.** The app has no login, so anyone with the URL could spend your credits. With no key set, the Anthropic option shows as disabled.
+2. Deploy. No environment variables are needed.
 
-Suites are still stored in each visitor's browser.
+A hosted deployment is public and has no login, so the adapter runs in **demo mode**:
+
+- **Mock provider only.** Anthropic is disabled even if `ANTHROPIC_API_KEY` is set, so nobody can spend API credits through the URL. To use real models, run EvalSprint locally.
+- **Request limits:** 200 KB request bodies, 50 test cases per suite, and a 10-second function timeout.
+- **Regex limits:** every regex assertion has a time limit (250 ms each, 1 s total per run), so a pathological pattern can't hang the server. Patterns are capped at 500 characters everywhere.
+- **Security headers:** a strict Content-Security-Policy, `X-Frame-Options: DENY`, `nosniff`, and `Referrer-Policy: no-referrer`.
+
+There is no rate limiting. If a deployment attracts abuse, add a rate-limit rule in the Vercel Firewall. Suites are stored in each visitor's browser, never on the server.
 
 ## Configuration
 
@@ -224,7 +230,7 @@ examples/      Sample suite file
 
 The web UI never evaluates anything itself: it posts the suite to the local server, which runs `core`. The CLI calls `core` directly.
 
-**Security notes.** The server binds to `127.0.0.1` by default and has no authentication. If you set `HOST=0.0.0.0`, anyone who can reach the port can run evaluations — and spend your API credits if a key is configured; the server prints a warning. POST endpoints require `Content-Type: application/json` and reject cross-origin requests, so other websites can't trigger runs through your local server.
+**Security notes.** Regex assertions always run with a time limit (1 s each by default), so a pathological pattern fails with a clear message instead of hanging the process. The server binds to `127.0.0.1` by default and has no authentication. If you set `HOST=0.0.0.0`, anyone who can reach the port can run evaluations — and spend your API credits if a key is configured; the server prints a warning. POST endpoints require `Content-Type: application/json` and reject cross-origin requests, so other websites can't trigger runs through your local server.
 
 ## Development
 

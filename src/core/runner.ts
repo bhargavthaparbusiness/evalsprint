@@ -1,4 +1,5 @@
-import { evaluateAssertion } from "./assertions.js";
+import { evaluateAssertion, type AssertionOptions } from "./assertions.js";
+import { createGuardedRegexMatcher } from "./regex-guard.js";
 import type { Provider } from "./providers/types.js";
 import { ProviderError } from "./providers/types.js";
 import { renderPrompt, TemplateError } from "./template.js";
@@ -25,6 +26,10 @@ export interface RunOptions {
   concurrency?: number;
   signal?: AbortSignal;
   onCaseComplete?: (result: CaseResult, index: number) => void;
+  /** Time limit for each regex assertion. Defaults to 1000 ms. */
+  regexTimeoutMs?: number;
+  /** Total regex time allowed for the whole run. Defaults to unlimited. */
+  regexBudgetMs?: number;
   /** Injectable clock for deterministic tests. */
   now?: () => number;
 }
@@ -54,7 +59,10 @@ export function findPrompt(suite: Suite, promptId?: string): PromptVersion {
 export async function runCase(
   testCase: TestCase,
   prompt: PromptVersion,
-  options: Omit<RunOptions, "promptId" | "concurrency" | "onCaseComplete"> & { model?: string },
+  options: Omit<RunOptions, "promptId" | "concurrency" | "onCaseComplete"> & {
+    model?: string;
+    assertionOptions?: AssertionOptions;
+  },
 ): Promise<CaseResult> {
   const now = options.now ?? (() => performance.now());
   const base: CaseResult = {
@@ -84,7 +92,9 @@ export async function runCase(
       ...(options.signal ? { signal: options.signal } : {}),
     });
     const latencyMs = Math.max(0, Math.round(now() - started));
-    const assertions = testCase.assertions.map((assertion) => evaluateAssertion(assertion, response.text));
+    const assertions = testCase.assertions.map((assertion) =>
+      evaluateAssertion(assertion, response.text, options.assertionOptions),
+    );
     const result: CaseResult = {
       ...base,
       status: assertions.every((a) => a.passed) ? "pass" : "fail",
@@ -137,6 +147,9 @@ export async function runSuite(suite: Suite, options: RunOptions): Promise<RunRe
       : (options.model ?? suite.settings?.model ?? options.provider.defaultModel);
   const maxTokens = options.maxTokens ?? suite.settings?.maxTokens;
   const concurrency = Math.max(1, Math.min(options.concurrency ?? 4, 16));
+  const assertionOptions: AssertionOptions = {
+    matchRegex: createGuardedRegexMatcher(options.regexTimeoutMs ?? 1000, options.regexBudgetMs),
+  };
   const startedAt = new Date().toISOString();
   const started = now();
 
@@ -153,6 +166,7 @@ export async function runSuite(suite: Suite, options: RunOptions): Promise<RunRe
         ...(maxTokens !== undefined ? { maxTokens } : {}),
         ...(options.signal ? { signal: options.signal } : {}),
         now,
+        assertionOptions,
       });
       results[index] = result;
       options.onCaseComplete?.(result, index);

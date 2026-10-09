@@ -179,6 +179,16 @@ Exit codes: `0` all tests passed, `1` at least one test failed or errored, `2` u
 
 Inside this repo use `npm run evalsprint -- <args>`. After `npm run build`, `node dist/cli/index.js <args>` works too, and `npm link` exposes an `evalsprint` command. (The package is not published to npm.)
 
+## Deploy a preview to Vercel
+
+The repo includes a small Vercel adapter (`vercel.json` and `api/*.js`). It serves the built UI as static files and exposes the existing API handler as serverless functions.
+
+1. In Vercel, choose **Add New → Project**, import this GitHub repository, and keep the defaults (`vercel.json` sets the build command and output directory).
+2. Deploy. The mock provider works immediately, with no environment variables.
+3. **Do not set `ANTHROPIC_API_KEY` on a public deployment.** The app has no login, so anyone with the URL could spend your credits. With no key set, the Anthropic option shows as disabled.
+
+Suites are still stored in each visitor's browser.
+
 ## Configuration
 
 | Variable | Default | Purpose |

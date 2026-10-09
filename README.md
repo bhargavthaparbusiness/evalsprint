@@ -7,10 +7,10 @@ PitchvioEvals is for developers who iterate on prompts and want something more r
 - **Website:** <https://pitchvio.info>
 - **Live demo app:** <https://pitchvio.info/app> (mock provider only — see [Deploy a preview to Vercel](#deploy-a-preview-to-vercel))
 - **Legacy deployment URL:** <https://evalsprint.vercel.app> (same deployment; pages point search engines to pitchvio.info)
-- **Source:** <https://github.com/bhargavthaparbusiness/evalsprint>
+- **Source:** <https://github.com/bhargavthaparbusiness/pitchvioevals>
 - **Contact:** [contact@pitchvio.info](mailto:contact@pitchvio.info)
 
-> PitchvioEvals was previously called **EvalSprint**. The GitHub repository and the legacy Vercel address still use the old name; the `evalsprint` CLI command, the `EVALSPRINT_ANTHROPIC_MODEL` variable and suites saved in the browser keep working.
+> PitchvioEvals was previously called **EvalSprint**. The legacy Vercel address still uses the old name (the old GitHub repository URL redirects here); the `evalsprint` CLI command, the `EVALSPRINT_ANTHROPIC_MODEL` variable and suites saved in the browser keep working.
 
 > **Status:** early MVP (v0.1). The feature set below is what exists today. See [Limitations](#limitations) and [Roadmap](#roadmap).
 
@@ -30,8 +30,8 @@ PitchvioEvals is for developers who iterate on prompts and want something more r
 Requires Node.js 20.12 or newer.
 
 ```bash
-git clone https://github.com/bhargavthaparbusiness/evalsprint.git
-cd evalsprint
+git clone https://github.com/bhargavthaparbusiness/pitchvioevals.git
+cd pitchvioevals
 npm install
 npm run dev
 ```
@@ -294,7 +294,7 @@ Please don't commit `.env` files or API keys.
 ## Contact
 
 - General and business enquiries: [contact@pitchvio.info](mailto:contact@pitchvio.info)
-- Bugs and feature requests: [GitHub Issues](https://github.com/bhargavthaparbusiness/evalsprint/issues)
+- Bugs and feature requests: [GitHub Issues](https://github.com/bhargavthaparbusiness/pitchvioevals/issues)
 - Security issues: email the address above privately rather than opening a public issue.
 
 PitchvioEvals is maintained by one person, so replies may take a few days.

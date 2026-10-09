@@ -15,7 +15,7 @@ export const SITE_URL = "https://pitchvio.info";
 export const SITE_NAME = "PitchvioEvals";
 /** Public product/business contact address (receiving only; see /privacy). */
 export const CONTACT_EMAIL = "contact@pitchvio.info";
-export const REPO_URL = "https://github.com/bhargavthaparbusiness/evalsprint";
+export const REPO_URL = "https://github.com/bhargavthaparbusiness/pitchvioevals";
 export const DOCS_URL = `${REPO_URL}#readme`;
 export const ISSUES_URL = `${REPO_URL}/issues`;
 
